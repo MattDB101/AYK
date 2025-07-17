@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "park-lodge-care-system",
+    "imep": "imep-qr-code",
+    "fleetiq": "cremin-coaches-fleetiq"
+  },
+  "targets": {},
+  "etags": {}
+}
