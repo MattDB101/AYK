@@ -8,16 +8,16 @@ body {
 
 .navbarLogo {
   font-family: 'YoungSerif', serif;
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #4b6737;
   margin: auto;
   width: fit-content;
-  padding: 50px;
-  padding-bottom: 20px;
+  padding: 20px;
+  padding-bottom: 10px;
 }
 
 .btn {
-  margin-top: -10px;
+  margin-top: -15px;
   padding: 20px 50px;
   border-radius: 999px;
   font-size: 1rem;
@@ -52,7 +52,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end; /* ensures buttons align right */
-  padding: 16px 32px;
+  padding: 8px;
   font-family: 'Bitter', serif;
 }
 
@@ -63,7 +63,7 @@ body {
   display: flex;
   gap: 3vw;
   list-style: none;
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #555555dc;
   margin: 0;
   padding: 0;
@@ -81,6 +81,6 @@ body {
 
 .navbarButtons {
   display: flex;
-  gap: 40px;
+  gap: 1vw;
   z-index: 1;
 }

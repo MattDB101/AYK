@@ -1,6 +1,14 @@
-.login-form-container {
+.react-select-container {
+  width: 100%;
+}
+
+.react-select-container .react-select__control {
+  width: 100%;
+}
+
+.signup-form-container {
   display: flex;
-  width: min-content;
+  width: 80%;
   gap: 150px;
   justify-content: space-between;
   background: #fff;
@@ -8,41 +16,53 @@
   gap: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin: 50px auto;
+  margin: 10px auto;
 }
-.login-form {
+.signup-form {
   border: 1px solid #555;
   border-radius: 15px;
   margin: 50px 10px;
-  min-width: 500px;
-  padding: 50px 0;
+  padding: 20px;
+  width: 100%;
 }
-.login-form-container img {
+.signup50-50 {
+  display: flex;
+  gap: 50px;
+  width: 100%;
+}
+
+.signup50-50-left,
+.signup50-50-right {
+  flex: 1;
+  width: 50%;
+  align-content: center;
+}
+
+.signup-form-container img {
   height: 400px;
   margin: auto 100px;
   justify-content: center;
 }
 
-.login-form-contents {
-  padding: 50px;
+.signup-form-contents {
+  padding: 20px 50px;
 }
 
-.login-form h2 {
+.signup-form h2 {
   font-family: 'Bitter', sans-serif;
   font-size: 2.5em;
   color: #4b6737;
   margin: auto;
-  margin-bottom: 10px;
   width: fit-content;
 }
 
-.login-form label {
+.signup-form label {
   display: block;
   margin: 2rem auto;
   font-weight: bold;
 }
 
-.login-form span {
+.signup-form span {
   display: block;
   margin-bottom: 2px;
   font-family: 'Bitter', serif;
@@ -52,7 +72,7 @@
   font-size: 1.2em;
 }
 
-.login-form input {
+.signup-form input {
   padding: 8px 6px;
   font-size: 1em;
   color: #777;
@@ -60,9 +80,11 @@
   border-radius: 10px;
   background-color: #f3f2e6;
   border: 2px solid #555;
+  width: -webkit-fill-available;
+  width: -moz-available;
 }
 
-.login-form button {
+.signup-form button {
   background-color: #4b6737 !important;
   width: fit-content;
   border-radius: 30px;
@@ -77,4 +99,13 @@
   margin-left: 100px;
   padding: 20px 30px;
   float: right;
+}
+
+.err {
+  font-family: 'Bitter', serif;
+  width: fit-content;
+  color: red;
+  font-size: 1.2em;
+
+  margin: 15px auto;
 }

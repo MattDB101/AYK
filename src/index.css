@@ -37,30 +37,6 @@ h4 {
 ul {
   list-style-type: none;
 }
-.btn {
-  background: #007bff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1em;
-}
-.btn:active {
-  background: #007bff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  color: #444;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1em;
-}
-
-.err {
-  margin-top: 2em;
-  color: red;
-  text-align: center;
-}
 
 .startDate .css-z3c6am-MuiFormControl-root-MuiTextField-root {
   width: 100%;

@@ -7,6 +7,10 @@ export const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN':
       return { ...state, user: action.payload };
+    case 'SIGNUP':
+      return { ...state, user: action.payload };
+    case 'UPDATE_PROFILE':
+      return { ...state, user: { ...state.user, ...action.payload } };
 
     case 'LOGOUT':
       return { ...state, user: null };
@@ -34,9 +38,5 @@ export const AuthContextProvider = ({ children }) => {
 
   console.log('AuthContext state: ', state);
 
-  return (
-    <AuthContext.Provider value={{ ...state, dispatch }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ ...state, dispatch }}>{children}</AuthContext.Provider>;
 };
