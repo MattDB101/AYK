@@ -7,7 +7,13 @@ import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
 import OnboardingMenu from './components/OnboardingMenu';
 import Dashboard from './pages/dashboard/Dashboard';
+import Orders from './pages/orders/orders.jsx';
+import RecipeBook from './pages/recipe-book/RecipeBook';
+import LearningCenter from './pages/learning-center/LearningCenter';
+import Settings from './pages/settings/Settings';
+import Forum from './pages/forum/Forum';
 import SetupProfile from './pages/setup-profile/SetupProfile';
+import DashboardLayout from './components/DashboardLayout';
 
 function App() {
   const { authIsReady, user } = useAuthContext();
@@ -17,7 +23,6 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  // Check if user needs to complete profile
   const needsProfileSetup = user && profile && (!profile.fname || !profile.lname);
 
   return (
@@ -32,7 +37,7 @@ function App() {
                   <Login />
                 </OnboardingMenu>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/orders" />
               )
             }
           />
@@ -44,7 +49,7 @@ function App() {
                   <Signup />
                 </OnboardingMenu>
               ) : (
-                <Navigate to="/" />
+                <Navigate to="/orders" />
               )
             }
           />
@@ -61,12 +66,26 @@ function App() {
             }
           />
 
+          {/* Protected dashboard routes */}
           <Route
             path="/"
             element={
-              !user ? <Navigate to="/login" /> : needsProfileSetup ? <Navigate to="/setup-profile" /> : <Dashboard />
+              !user ? (
+                <Navigate to="/login" />
+              ) : needsProfileSetup ? (
+                <Navigate to="/setup-profile" />
+              ) : (
+                <DashboardLayout />
+              )
             }
-          />
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="recipes" element={<RecipeBook />} />
+            <Route path="learning" element={<LearningCenter />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="forum" element={<Forum />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>

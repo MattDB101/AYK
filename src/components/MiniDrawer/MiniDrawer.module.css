@@ -1,0 +1,171 @@
+.root {
+  display: flex;
+  height: 100vh;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  max-width: 40px;
+  color: rgb(224, 10, 10);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+  position: fixed;
+  left: calc(140px - 30px);
+  top: 200px;
+}
+.closedLogo {
+  max-width: 80px;
+  margin: 0 auto;
+}
+.openLogo {
+  max-width: 180px;
+  margin: 0 auto;
+}
+
+.open .menuButton {
+  transform: rotate(180deg);
+  left: calc(335px - 30px);
+}
+.open .menuButton {
+  transform: rotate(180deg);
+}
+
+.drawer {
+  position: fixed;
+  border-right: 1px solid #2b2b2b1f;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background-color: #ffffff;
+  color: #555;
+  font-family: 'YoungSerif', serif;
+  overflow: hidden;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer.open {
+  gap: 0;
+}
+
+.drawer.closed {
+  gap: 140px;
+}
+
+.closed {
+  width: 140px;
+}
+
+.open {
+  width: 335px;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  min-height: 4rem;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.75rem;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+
+  border-radius: 1rem;
+  min-height: 3.1rem;
+  position: relative;
+}
+
+.closed .navItem {
+  justify-content: center;
+  padding: 1rem 0.5rem;
+}
+
+.open .navItem {
+  justify-content: flex-start;
+  padding: 1rem;
+}
+
+.navItem:hover {
+  transform: translateY(-2px);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.navItem.active {
+  background-color: #588157;
+  color: white;
+}
+
+.logoutItem:hover {
+  color: white;
+  background-color: #c0392b !important;
+}
+
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closed .icon {
+  width: 100%;
+  margin: 0;
+}
+
+.open .icon {
+  margin-right: 1rem;
+}
+
+.navItem span:not(.icon) {
+  white-space: nowrap;
+  overflow: hidden;
+  flex: 1;
+
+  font-size: 1.4rem;
+}
+
+.closed .navItem span:not(.icon) {
+  opacity: 0;
+  width: 0;
+}
+
+.open .navItem span:not(.icon) {
+  opacity: 1;
+}
+
+.content {
+  flex: 1;
+  margin-left: 140px;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+.contentShift {
+  margin-left: 335px;
+}
+
+@media (max-width: 768px) {
+  .open {
+    width: 100vw;
+  }
+}
