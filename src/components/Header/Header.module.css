@@ -1,0 +1,33 @@
+.root {
+  display: flex;
+  height: 70px;
+  border-bottom: 1px solid #588157;
+  color: white;
+  font-size: 2rem;
+  justify-content: space-between;
+  align-items: end;
+  padding: 10px 40px;
+  padding-bottom: 20px;
+  font-family: 'Bitter', sans-serif;
+  font-weight: bold;
+}
+
+.headerTitle {
+  font-size: 2.5rem;
+  color: #588157;
+}
+
+.headerNav {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+}
+
+.headerNav img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid white;
+}

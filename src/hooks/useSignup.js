@@ -56,9 +56,6 @@ export const useSignup = () => {
           createdAt: new Date(),
         });
 
-      // Update the user profile with school name as display name
-      await res.user.updateProfile({ displayName: school });
-
       dispatch({ type: 'SIGNUP', payload: res.user });
 
       if (!isCancelled) {

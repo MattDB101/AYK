@@ -1,0 +1,293 @@
+.container {
+  padding: 2rem;
+  max-width: 1800px;
+  width: 90%;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 4rem;
+}
+
+.backButton {
+  background: none;
+  border: 1px solid #6f897d;
+  color: #6f897d;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background-color: #6f897d;
+  color: white;
+}
+
+.header h1 {
+  font-family: 'Bitter', sans-serif;
+  font-size: 2.5rem;
+  color: #4b6737;
+  width: fit-content;
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: #666;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchContainer {
+  display: flex;
+  float: right;
+  margin-right: 55px;
+  max-width: 400px;
+  position: relative;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 25px 0 0 25px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #6f897d;
+  box-shadow: 0 0 0 2px rgba(111, 137, 125, 0.2);
+}
+
+.searchButton {
+  background-color: #6f897d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0 25px 25px 0;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.categorySection {
+  position: relative;
+}
+
+.categoryTitle {
+  font-family: 'Bitter', sans-serif;
+  color: #6f897d;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Carousel styles */
+.carouselWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.carouselContainer {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.recipeCarousel {
+  overflow: hidden;
+  width: 100%;
+}
+
+.recipeTrack {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  gap: 1.5rem;
+  padding: 15px 0;
+}
+
+.recipeCard {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 calc(33.333% - 1rem);
+  min-width: 280px;
+}
+
+.recipeCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.recipeImageContainer {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.recipeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.recipeCard:hover .recipeImage {
+  transform: scale(1.05);
+}
+
+.recipeInfo {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.recipeName {
+  font-family: 'Bitter', sans-serif;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.recipeDescription {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem 0;
+  flex-grow: 1;
+  line-height: 1.4;
+}
+
+.viewMoreButton {
+  background-color: #6f897d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.viewMoreButton:hover {
+  background-color: #5a7368;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(111, 137, 125, 0.4);
+}
+
+/* Arrow buttons on the sides */
+.arrowButton {
+  background-color: #6f897d;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: white;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.arrowButton:hover:not(.disabled) {
+  background-color: #5a7368;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(111, 137, 125, 0.4);
+}
+
+.arrowButton.disabled {
+  background-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.arrowLeft {
+  order: 1;
+}
+
+.arrowRight {
+  order: 3;
+}
+
+.carouselContainer {
+  order: 2;
+}
+
+/* Remove the old navigationArrows styles */
+.navigationArrows {
+  display: none;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .recipeCard {
+    flex: 0 0 calc(50% - 0.75rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .carouselWrapper {
+    gap: 0.5rem;
+  }
+
+  .arrowButton {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .recipeCard {
+    flex: 0 0 calc(100% - 0rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .carouselWrapper {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .arrowButton {
+    order: initial;
+  }
+
+  .carouselContainer {
+    order: initial;
+  }
+
+  .navigationArrows {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .arrowLeft,
+  .arrowRight {
+    position: static;
+  }
+}

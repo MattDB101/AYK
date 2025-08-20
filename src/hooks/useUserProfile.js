@@ -8,31 +8,39 @@ export const useUserProfile = () => {
   const [error, setError] = useState(null);
   const { user } = useAuthContext();
 
-  const fetchProfile = async () => {
+  useEffect(() => {
     if (!user) {
       setProfile(null);
       setLoading(false);
       return;
     }
 
-    try {
-      const doc = await projectFirestore.collection('users').doc(user.uid).get();
-      if (doc.exists) {
-        setProfile(doc.data());
-      } else {
-        setProfile(null);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(true);
 
-  useEffect(() => {
-    fetchProfile();
+    // Use real-time listener instead of one-time fetch
+    const unsubscribe = projectFirestore
+      .collection('users')
+      .doc(user.uid)
+      .onSnapshot(
+        (doc) => {
+          if (doc.exists) {
+            setProfile({ id: doc.id, ...doc.data() });
+          } else {
+            // Document doesn't exist - new user needs profile setup
+            setProfile(null);
+          }
+          setLoading(false);
+        },
+        (err) => {
+          console.error('Error fetching user profile:', err);
+          setError(err.message);
+          setProfile(null);
+          setLoading(false);
+        }
+      );
+
+    return () => unsubscribe();
   }, [user]);
 
-  // Return refresh function
-  return { profile, loading, error, refreshProfile: fetchProfile };
+  return { profile, loading, error };
 };

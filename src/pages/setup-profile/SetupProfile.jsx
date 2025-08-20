@@ -38,9 +38,10 @@ export default function SetupProfile() {
     setError(null);
 
     try {
-      let avatarURL = '';
+      let avatarURL = null;
       if (profileImage) {
-        const filename = `avatars/${user.uid}_${Date.now()}.${profileImage.name.split('.').pop()}`;
+        // Fixed path to match your storage rules
+        const filename = `avatars/${user.uid}/${Date.now()}.${profileImage.name.split('.').pop()}`;
         const storageRef = projectStorage.ref(filename);
         const uploadTask = await storageRef.put(profileImage);
         avatarURL = await uploadTask.ref.getDownloadURL();
@@ -49,29 +50,30 @@ export default function SetupProfile() {
       // Update Firebase Auth profile (for quick access)
       await user.updateProfile({
         displayName: `${fname.trim()} ${lname.trim()}`,
-        photoURL: avatarURL || user.photoURL, // Keep existing photo if no new upload
+        photoURL: avatarURL || user.photoURL,
       });
 
       const updateData = {
         fname: fname.trim(),
         lname: lname.trim(),
-        displayName: `${fname.trim()} ${lname.trim()}`, // Duplicate for querying
+        displayName: `${fname.trim()} ${lname.trim()}`,
       };
 
       if (avatarURL) {
         updateData.avatar = avatarURL;
+        updateData.photoURL = avatarURL; // Keep consistent
       }
 
       await projectFirestore.collection('users').doc(user.uid).update(updateData);
 
       window.location.href = '/';
     } catch (err) {
+      console.error('Profile setup error:', err);
       setError(err.message);
     } finally {
       setIsPending(false);
     }
   };
-
   return (
     <div className={styles['setup-form-container']}>
       <form onSubmit={handleSubmit} className={styles['setup-form']}>
@@ -95,7 +97,7 @@ export default function SetupProfile() {
           <div className={styles['setup-form-profile-img']}>
             <h3>Profile Photo</h3>
             <img
-              src={imagePreview || user.photoURL || '/default-profile.jpg'}
+              src={imagePreview || user.photoURL || '/default-avatar.jpg'}
               alt="Profile"
               className={styles['profile-img']}
             />

@@ -15,13 +15,6 @@ export const useLogin = () => {
     try {
       const res = await projectAuth.signInWithEmailAndPassword(email, password);
 
-      if (res.user.displayName == null) {
-        let displayName = prompt('Please enter your full name.');
-        res.user.updateProfile({ displayName });
-        setIsPending(false);
-        setError(null);
-      }
-
       // dispatch login action
       dispatch({ type: 'LOGIN', payload: res.user });
 
