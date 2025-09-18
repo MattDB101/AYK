@@ -20,6 +20,10 @@ function CreateRecipe() {
   const [slides, setSlides] = useState([]);
   const [videos, setVideos] = useState([]);
   const [tips, setTips] = useState([]);
+  const [recipeSlides, setRecipeSlides] = useState([]);
+  const [recipeCardSlides, setRecipeCardSlides] = useState([]);
+  const [workSheetSlides, setWorkSheetSlides] = useState([]);
+  const [allergens, setAllergens] = useState([]);
 
   const { addRecipe, loading, error } = useRecipeManager();
 
@@ -43,11 +47,18 @@ function CreateRecipe() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Combine videos and tips into a single content array
       const allContent = [...videos, ...tips];
-      await addRecipe(formData, imageFile, slides, allContent); // Changed from just videos to allContent
+      await addRecipe(
+        { ...formData, allergens },
+        imageFile,
+        {
+          recipeSlides,
+          recipeCardSlides,
+          workSheetSlides,
+        },
+        allContent
+      );
       alert('Recipe created successfully!');
       navigate('/admin');
     } catch (error) {
@@ -136,10 +147,46 @@ function CreateRecipe() {
             )}
           </div>
 
-          <SlideDeckUploader slides={slides} onSlidesChange={setSlides} />
+          {/* Recipe Slides */}
+          <SlideDeckUploader slides={recipeSlides} onSlidesChange={setRecipeSlides} label="Recipe Slides" />
+
+          {/* Recipe Card Slides */}
+          <SlideDeckUploader
+            slides={recipeCardSlides}
+            onSlidesChange={setRecipeCardSlides}
+            label="Recipe Card Slides"
+          />
+
+          {/* Work Sheet Slides */}
+          <SlideDeckUploader slides={workSheetSlides} onSlidesChange={setWorkSheetSlides} label="Work Sheet Slides" />
 
           <VideoContentManager videos={videos} onVideosChange={setVideos} />
           <TipContentManager tips={tips} onTipsChange={setTips} />
+
+          <div className={styles.formGroup}>
+            <label>Allergens</label>
+            <div className={styles.allergenCheckboxes}>
+              {[...Array(14)].map((_, i) => {
+                const allergenNumber = i + 1;
+                return (
+                  <label key={allergenNumber} className={styles.allergenLabel}>
+                    <input
+                      type="checkbox"
+                      value={allergenNumber}
+                      checked={allergens.includes(allergenNumber)}
+                      onChange={(e) =>
+                        setAllergens((prev) =>
+                          e.target.checked ? [...prev, allergenNumber] : prev.filter((a) => a !== allergenNumber)
+                        )
+                      }
+                      disabled={loading}
+                    />
+                    Allergen {allergenNumber}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
 
           <div className={styles.actions}>
             <button type="button" className={styles.cancelButton} onClick={handleCancel} disabled={loading}>

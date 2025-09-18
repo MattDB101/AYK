@@ -11,6 +11,7 @@ import BubbleChatStrokeRounded from '../icons/bubble-chat-stroke-rounded';
 import Notebook01StrokeRouneded from '../icons/notebook-01-stroke-rounded';
 import ChefHatStrokeRouneded from '../icons/chef-hat-stroke-rounded';
 import Setting07StrokeRounded from '../icons/setting-07-stroke-rounded';
+import AdminIconStroke from '../icons/admin-icon-stroke';
 
 export default function MiniDrawer({ children }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,15 +24,12 @@ export default function MiniDrawer({ children }) {
   const getActiveItem = () => {
     const path = location.pathname;
     if (path === '/' || path.startsWith('/dashboard')) return 'Dashboard';
-    if (path === '/orders' || path.startsWith('/orders/')) return 'Orders';
-    if (path === '/recipes' || path.startsWith('/recipes/'))
-      return 'Recipe Book';
-    if (path === '/learning' || path.startsWith('/learning/'))
-      return 'Learning Center';
-    if (path === '/forum' || path.startsWith('/forum/')) return 'Forum';
-    if (path === '/settings' || path.startsWith('/settings/'))
-      return 'Settings';
-    if (path === '/admin' || path.startsWith('/admin/')) return 'Admin Panel';
+    if (path.startsWith('/orders')) return 'Orders';
+    if (path.startsWith('/recipes')) return 'Recipe Book';
+    if (path.startsWith('/learning')) return 'Learning Center';
+    if (path.startsWith('/forum')) return 'Forum';
+    if (path.startsWith('/settings')) return 'Settings';
+    if (path.startsWith('/admin')) return 'Admin Panel';
     return 'Dashboard';
   };
 
@@ -62,13 +60,14 @@ export default function MiniDrawer({ children }) {
       case 'Settings':
         navigate('/settings');
         break;
-      case 'Admin':
+      case 'Admin Panel':
         navigate('/admin');
         break;
     }
   };
 
-  const navItems = [
+  // Base navigation items
+  const baseNavItems = [
     {
       name: 'Dashboard',
       icon: <DashboardSquare02Icon size={24} color="currentColor" />,
@@ -93,15 +92,26 @@ export default function MiniDrawer({ children }) {
       name: 'Settings',
       icon: <Setting07StrokeRounded size={24} color="currentColor" />,
     },
-    {
-      name: 'Admin',
-      icon: <Setting07StrokeRounded size={24} color="currentColor" />,
-    },
-    {
-      name: 'Logout',
-      icon: <Logout02StrokeRounded size={24} color="currentColor" />,
-      onClick: logout,
-    },
+  ];
+
+  const adminNavItem = {
+    name: 'Admin Panel',
+    icon: <AdminIconStroke size={24} color="currentColor" />,
+  };
+
+  // Logout item
+  const logoutItem = {
+    name: 'Logout',
+    icon: <Logout02StrokeRounded size={24} color="currentColor" />,
+    onClick: logout,
+  };
+
+  // Conditionally build navigation items
+  const navItems = [
+    ...(user?.isAdmin ? [adminNavItem] : []), // Only show Admin if user is admin
+    ...baseNavItems,
+
+    logoutItem,
   ];
 
   return (

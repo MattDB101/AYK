@@ -3,8 +3,11 @@ import { projectStorage } from '../../firebase/config';
 import { ref, getDownloadURL, listAll } from 'firebase/storage';
 import LoadingDots from '../LoadingDots/LoadingDots';
 import styles from './SlideDeck.module.css';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import DownloadIcon from '../icons/download-02';
 
-function SlideDeck({ slideDeckPath }) {
+function SlideDeck({ slideDeckPath, title, allowDownload }) {
   const [slides, setSlides] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ function SlideDeck({ slideDeckPath }) {
         setError(null);
 
         // Create reference to the slides folder
-        const slidesRef = ref(projectStorage, `slides/${slideDeckPath}`);
+        const slidesRef = ref(projectStorage, slideDeckPath);
 
         // List all items in the slides folder
         const listResult = await listAll(slidesRef);
@@ -63,23 +66,38 @@ function SlideDeck({ slideDeckPath }) {
   }, [slideDeckPath]);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => (prev < slides.length - 1 ? prev + 1 : prev));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
   };
 
+  const downloadSlides = async () => {
+    const zip = new JSZip();
+    console.log('Downloading slides:', slides);
+    for (let idx = 0; idx < slides.length; idx++) {
+      const slide = slides[idx];
+      // Fetch the image as a blob (requires CORS to be set up)
+      const response = await fetch(slide.url);
+      const blob = await response.blob();
+      zip.file(`slide-${idx + 1}.png`, blob);
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    saveAs(content, `${title || 'slides'}.zip`);
+  };
+
   if (loading) {
     return (
       <div className={styles.slideDeckContainer}>
-        <h2 className={styles.title}>Slide Deck</h2>
+        <h2 className={styles.title}>{title}</h2>
         <div className={styles.loadingState}>
-          <LoadingDots text="Loading slides" />
+          <LoadingDots text="Loading" />
         </div>
       </div>
     );
@@ -88,7 +106,7 @@ function SlideDeck({ slideDeckPath }) {
   if (error || slides.length === 0) {
     return (
       <div className={styles.slideDeckContainer}>
-        <h2 className={styles.title}>Slide Deck</h2>
+        <h2 className={styles.title}>{title}</h2>
         <div className={styles.emptyState}>
           <p>{error || 'No slides available for this content.'}</p>
         </div>
@@ -97,14 +115,26 @@ function SlideDeck({ slideDeckPath }) {
   }
 
   return (
-    <div className={styles.slideDeckContainer}>
-      <h2 className={styles.title}>Slide Deck</h2>
+    <div id={title} className={styles.slideDeckContainer}>
+      <div className={styles.downloadContainer}>
+        <h2 className={styles.title}>{title}</h2>
+        {allowDownload && (
+          <div
+            onClick={downloadSlides}
+            className={styles.downloadIconContainer}
+          >
+            <DownloadIcon />
+
+            <span>Download Worksheet</span>
+          </div>
+        )}
+      </div>
 
       <div className={styles.slideContainer}>
         <button
           className={styles.navButton}
           onClick={prevSlide}
-          disabled={slides.length <= 1}
+          disabled={currentSlide === 0}
         >
           ◀
         </button>
@@ -122,7 +152,7 @@ function SlideDeck({ slideDeckPath }) {
         <button
           className={styles.navButton}
           onClick={nextSlide}
-          disabled={slides.length <= 1}
+          disabled={currentSlide === slides.length - 1}
         >
           ▶
         </button>

@@ -19,9 +19,12 @@ function EditRecipe() {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [slides, setSlides] = useState([]);
   const [videos, setVideos] = useState([]);
   const [tips, setTips] = useState([]);
+  const [recipeSlides, setRecipeSlides] = useState([]);
+  const [recipeCardSlides, setRecipeCardSlides] = useState([]);
+  const [workSheetSlides, setWorkSheetSlides] = useState([]);
+  const [allergens, setAllergens] = useState([]); // array of numbers 1-14
 
   const [videosLoading, setVideosLoading] = useState(true);
   const [tipsLoading, setTipsLoading] = useState(true);
@@ -98,6 +101,7 @@ function EditRecipe() {
         category: recipe.category || '',
       });
       setImagePreview(recipe.imageUrl || null);
+      setAllergens(recipe.allergens || []);
     }
   }, [recipe]);
 
@@ -121,12 +125,20 @@ function EditRecipe() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Combine videos and tips into a single content array
       const allContent = [...videos, ...tips];
-      console.log('All content being sent:', allContent);
-      await updateRecipe(recipeId, formData, imageFile, slides, allContent); // Changed from just videos to allContent
+      await updateRecipe(
+        recipeId,
+        { ...formData, allergens },
+        imageFile,
+        {
+          recipeSlides,
+          recipeCardSlides,
+          workSheetSlides,
+        },
+
+        allContent
+      );
       alert('Recipe updated successfully!');
       navigate('/admin');
     } catch (error) {
@@ -233,15 +245,46 @@ function EditRecipe() {
             )}
           </div>
 
-          <SlideDeckUploader slides={slides} onSlidesChange={setSlides} />
-          {recipe.slideDeckPath && slides.length === 0 && (
-            <div className={styles.existingSlidesNote}>
-              <p>📁 This recipe has existing slides. Upload new slides above to replace them.</p>
-            </div>
-          )}
+          {/* Recipe Slides */}
+          <SlideDeckUploader slides={recipeSlides} onSlidesChange={setRecipeSlides} label="Recipe Slides" />
+
+          {/* Recipe Card Slides */}
+          <SlideDeckUploader
+            slides={recipeCardSlides}
+            onSlidesChange={setRecipeCardSlides}
+            label="Recipe Card Slides"
+          />
+
+          {/* Work Sheet Slides */}
+          <SlideDeckUploader slides={workSheetSlides} onSlidesChange={setWorkSheetSlides} label="Work Sheet Slides" />
 
           <VideoContentManager videos={videos} onVideosChange={setVideos} />
           <TipContentManager tips={tips} onTipsChange={setTips} />
+
+          <div className={styles.formGroup}>
+            <label>Allergens</label>
+            <div className={styles.allergenCheckboxes}>
+              {[...Array(14)].map((_, i) => {
+                const allergenNumber = i + 1;
+                return (
+                  <label key={allergenNumber} className={styles.allergenLabel}>
+                    <input
+                      type="checkbox"
+                      value={allergenNumber}
+                      checked={allergens.includes(allergenNumber)}
+                      onChange={(e) => {
+                        setAllergens((prev) =>
+                          e.target.checked ? [...prev, allergenNumber] : prev.filter((a) => a !== allergenNumber)
+                        );
+                      }}
+                      disabled={updateLoading}
+                    />
+                    Allergen {allergenNumber}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
 
           <div className={styles.actions}>
             <button type="button" className={styles.cancelButton} onClick={handleCancel} disabled={updateLoading}>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import RecipeManager from './recipe-manager/RecipeManager';
 import SchoolManager from './school-manager/SchoolManager';
 import GeneralLearningManager from './general-learning-manager/GeneralLearningManager';
-
+import RecipeBookManager from './recipe-book-manager/RecipeBookManager';
 import TeacherManager from './teacher-manager/TeacherManager';
 import ClassManager from './class-manager/ClassManager';
 import styles from './AdminPanel.module.css';
@@ -16,6 +16,7 @@ function AdminPanel() {
     { id: 'schools', label: 'Schools', component: SchoolManager },
     { id: 'teachers', label: 'Teachers', component: TeacherManager },
     { id: 'classes', label: 'Classes', component: ClassManager },
+    { id: 'recipe-book', label: 'Recipe Book', component: RecipeBookManager },
   ];
 
   const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component;

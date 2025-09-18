@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { projectAuth } from '../firebase/config';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthContext } from './useAuthContext';
 
 export const useLogin = () => {
@@ -13,19 +14,29 @@ export const useLogin = () => {
     setIsPending(true);
 
     try {
-      const res = await projectAuth.signInWithEmailAndPassword(email, password);
+      const res = await signInWithEmailAndPassword(projectAuth, email, password);
 
-      // dispatch login action
-      dispatch({ type: 'LOGIN', payload: res.user });
+      // Get ID token with custom claims
+      const tokenResult = await res.user.getIdTokenResult();
 
-      // update state
+      const userData = {
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName,
+        emailVerified: res.user.emailVerified,
+        photoURL: res.user.photoURL,
+        phoneNumber: res.user.phoneNumber,
+        isAdmin: tokenResult.claims.isAdmin || false,
+        role: tokenResult.claims.role || 'student',
+      };
+
       if (!isCancelled) {
+        dispatch({ type: 'LOGIN', payload: userData });
         setIsPending(false);
         setError(null);
       }
     } catch (err) {
       if (!isCancelled) {
-        console.log(err.message);
         setError(err.message);
         setIsPending(false);
       }
@@ -36,5 +47,5 @@ export const useLogin = () => {
     return () => setIsCancelled(true);
   }, []);
 
-  return { login, error, isPending };
+  return { login, isPending, error };
 };

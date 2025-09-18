@@ -18,11 +18,11 @@ function LearningCenter() {
         </button>
       </div>
       <div className={styles.card}>
-        <h1>General Content</h1>
+        <h1>General Learning Content</h1>
         <div className={styles.imageContainer}>
           <img src="General Content.png" alt="General Content" />
         </div>
-        <h3>General content for the Home Economics Curriculum.</h3>
+        <h3>General learning content for the Home Economics Curriculum.</h3>
         <button className={styles.button} onClick={() => navigate('/learning/general')}>
           Go
         </button>
@@ -32,7 +32,7 @@ function LearningCenter() {
         <div className={styles.imageContainer}>
           <img src="Upload Content.jpg" alt="Upload Content" />
         </div>
-        <h3>Upload your own resources for either recipes or general content.</h3>
+        <h3>Upload your own resources for either recipes or general learning content.</h3>
         <button className={styles.button} onClick={() => navigate('/learning/upload')}>
           Go
         </button>

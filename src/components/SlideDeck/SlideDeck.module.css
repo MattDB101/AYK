@@ -7,10 +7,8 @@
   font-family: 'Bitter', sans-serif;
   font-size: 2rem;
   color: #4b6737;
-  margin-bottom: 2rem;
   text-align: left;
   font-weight: bold;
-  margin-left: 61px; /* Align with carousel titles */
 }
 
 .slideContainer {
@@ -151,13 +149,45 @@
     margin: 0 0.5rem;
   }
 
-  .title {
-    margin-left: 1rem;
-  }
-
   .emptyState,
   .loadingState {
     margin-left: 1rem;
     margin-right: 1rem;
   }
+}
+
+.downloadContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2%;
+}
+
+.downloadIconContainer {
+  background: transparent;
+  color: #588157;
+  font-family: 'Bitter';
+  border: 3px solid #588157;
+  border-radius: 20px;
+  padding: 8px;
+  font-size: 1.2rem;
+  width: fit-content;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  gap: 8px;
+}
+
+.downloadIconContainer:hover {
+  transform: scale(1.025);
+  background-color: #e9f5e1;
+}
+.downloadIconContainer {
+  display: flex;
+  align-items: center;
+}
+.downloadIconContainer:active {
+  transform: scale(0.95);
+  background-color: #e9f5e1;
+  box-shadow: 0 2px 8px rgba(88, 129, 87, 0.15);
 }

@@ -115,51 +115,43 @@ export const useRecipeManager = () => {
     }
   };
 
-  // Upload slides to storage
-  const uploadSlides = async (recipeId, recipeName, slides) => {
+  // Upload slides to storage for a given path
+  const uploadSlides = async (recipeName, slides, baseFolder = 'slides') => {
     if (!slides || slides.length === 0) return null;
-
-    const slideFolderPath = recipeName.toLowerCase().replace(/\s+/g, '-');
+    const recipeFolder = recipeName.toLowerCase().replace(/\s+/g, '-');
+    const basePath = `${baseFolder}/${recipeFolder}`;
 
     // Delete existing slides if they exist
     try {
-      const existingSlidesRef = ref(projectStorage, `slides/${slideFolderPath}`);
+      const existingSlidesRef = ref(projectStorage, basePath);
       const existingSlides = await listAll(existingSlidesRef);
-
-      // Delete all existing slides
       for (const item of existingSlides.items) {
         await deleteObject(item);
       }
     } catch (err) {
-      console.log('No existing slides to delete or error deleting:', err);
+      // Ignore if folder doesn't exist
     }
 
     // Upload new slides
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
       const slideNumber = (i + 1).toString().padStart(2, '0');
-      const slideRef = ref(projectStorage, `slides/${slideFolderPath}/${slideNumber}.png`);
-
-      try {
-        await uploadBytes(slideRef, slide.file);
-        console.log(`Uploaded slide ${slideNumber} to slides/${slideFolderPath}/${slideNumber}.png`);
-      } catch (err) {
-        console.error(`Error uploading slide ${slideNumber}:`, err);
-        throw new Error(`Failed to upload slide ${slideNumber}`);
-      }
+      const slideRef = ref(projectStorage, `${basePath}/${slideNumber}.png`);
+      await uploadBytes(slideRef, slide.file);
     }
-
-    return slideFolderPath;
+    return basePath;
   };
 
   // Add a new recipe
-  const addRecipe = async (recipeData, imageFile, slides = [], content = []) => {
+  const addRecipe = async (recipeData, imageFile, allSlides = {}, content = []) => {
     setLoading(true);
     setError(null);
 
     try {
       let imageUrl = null;
       let slideDeckPath = null;
+      let recipeCardSlidePath = null;
+      let workSheetSlidePath = null;
 
       // Upload main recipe image if provided
       if (imageFile) {
@@ -171,9 +163,18 @@ export const useRecipeManager = () => {
         imageUrl = await getDownloadURL(uploadResult.ref);
       }
 
-      // Upload slides if provided
-      if (slides.length > 0) {
-        slideDeckPath = await uploadSlides(null, recipeData.name, slides);
+      // Upload slides for each type
+      // Recipe Slides (main)
+      if (allSlides.recipeSlides && allSlides.recipeSlides.length > 0) {
+        slideDeckPath = await uploadSlides(recipeData.name, allSlides.recipeSlides, 'slides');
+      }
+      // Recipe Card Slides
+      if (allSlides.recipeCardSlides && allSlides.recipeCardSlides.length > 0) {
+        recipeCardSlidePath = await uploadSlides(recipeData.name, allSlides.recipeCardSlides, 'recipe-card-slides');
+      }
+      // Work Sheet Slides
+      if (allSlides.workSheetSlides && allSlides.workSheetSlides.length > 0) {
+        workSheetSlidePath = await uploadSlides(recipeData.name, allSlides.workSheetSlides, 'worksheet-slides');
       }
 
       // Create recipe document
@@ -184,17 +185,14 @@ export const useRecipeManager = () => {
         updatedAt: new Date(),
       };
 
-      if (imageUrl) {
-        recipeDoc.imageUrl = imageUrl;
-      }
-
-      if (slideDeckPath) {
-        recipeDoc.slideDeckPath = slideDeckPath;
-      }
+      if (imageUrl) recipeDoc.imageUrl = imageUrl;
+      if (slideDeckPath) recipeDoc.slideDeckPath = slideDeckPath;
+      if (recipeCardSlidePath) recipeDoc.recipeCardSlidePath = recipeCardSlidePath;
+      if (workSheetSlidePath) recipeDoc.workSheetSlidePath = workSheetSlidePath;
 
       const docRef = await projectFirestore.collection('recipes').add(recipeDoc);
 
-      // Save content (videos and tips) with proper thumbnail handling
+      // Save content (videos and tips)
       if (content.length > 0) {
         await saveContent(docRef.id, content);
       }
@@ -209,13 +207,15 @@ export const useRecipeManager = () => {
   };
 
   // Update a recipe
-  const updateRecipe = async (id, recipeData, imageFile, slides = [], content = []) => {
+  const updateRecipe = async (id, recipeData, imageFile, allSlides = {}, content = []) => {
     setLoading(true);
     setError(null);
 
     try {
       let imageUrl = recipeData.imageUrl;
       let slideDeckPath = recipeData.slideDeckPath;
+      let recipeCardSlidePath = recipeData.recipeCardSlidePath;
+      let workSheetSlidePath = recipeData.workSheetSlidePath;
 
       // Upload new main image if provided
       if (imageFile) {
@@ -227,15 +227,25 @@ export const useRecipeManager = () => {
         imageUrl = await getDownloadURL(uploadResult.ref);
       }
 
-      // Handle slide updates
-      if (slides.length > 0) {
-        slideDeckPath = await uploadSlides(id, recipeData.name, slides);
+      // Upload slides for each type
+      // Recipe Slides (main)
+      if (allSlides.recipeSlides && allSlides.recipeSlides.length > 0) {
+        slideDeckPath = await uploadSlides(recipeData.name, allSlides.recipeSlides, 'slides');
+      }
+      // Recipe Card Slides
+      if (allSlides.recipeCardSlides && allSlides.recipeCardSlides.length > 0) {
+        recipeCardSlidePath = await uploadSlides(recipeData.name, allSlides.recipeCardSlides, 'recipe-card-slides');
+      }
+      // Work Sheet Slides
+      if (allSlides.workSheetSlides && allSlides.workSheetSlides.length > 0) {
+        workSheetSlidePath = await uploadSlides(recipeData.name, allSlides.workSheetSlides, 'worksheet-slides');
       }
 
       // Update recipe document
       const updateData = {
         name: recipeData.name,
         description: recipeData.description,
+        allergens: recipeData.allergens,
         category: recipeData.category,
         updatedAt: new Date(),
       };
@@ -243,9 +253,14 @@ export const useRecipeManager = () => {
       if (imageUrl !== undefined && imageUrl !== null) {
         updateData.imageUrl = imageUrl;
       }
-
       if (slideDeckPath !== undefined && slideDeckPath !== null) {
         updateData.slideDeckPath = slideDeckPath;
+      }
+      if (recipeCardSlidePath !== undefined && recipeCardSlidePath !== null) {
+        updateData.recipeCardSlidePath = recipeCardSlidePath;
+      }
+      if (workSheetSlidePath !== undefined && workSheetSlidePath !== null) {
+        updateData.workSheetSlidePath = workSheetSlidePath;
       }
 
       await projectFirestore.collection('recipes').doc(id).update(updateData);
@@ -292,7 +307,7 @@ export const useRecipeManager = () => {
       // Delete slides from storage if they exist
       if (slideDeckPath) {
         try {
-          const slidesRef = ref(projectStorage, `slides/${slideDeckPath}`);
+          const slidesRef = ref(projectStorage, slideDeckPath);
           const slidesList = await listAll(slidesRef);
 
           for (const item of slidesList.items) {

@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { AuthContextProvider } from './context/AuthContext';
 import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
+import { CartProvider } from './context/cartContext';
 
 const theme = createTheme({
   typography: {
@@ -41,7 +42,9 @@ ReactDOM.render(
   <React.StrictMode>
     <AuthContextProvider>
       <MuiThemeProvider theme={theme}>
-        <App />
+        <CartProvider>
+          <App />
+        </CartProvider>
       </MuiThemeProvider>
     </AuthContextProvider>
   </React.StrictMode>,

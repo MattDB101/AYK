@@ -1,7 +1,10 @@
 import styles from './SetupProfile.module.css';
 import { useState } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import { projectFirestore, projectStorage } from '../../firebase/config';
+import { projectAuth, projectFirestore, projectStorage } from '../../firebase/config'; // Import projectAuth
+import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { updateProfile } from 'firebase/auth'; // Import updateProfile function
 
 export default function SetupProfile() {
   const [fname, setFname] = useState('');
@@ -40,33 +43,42 @@ export default function SetupProfile() {
     try {
       let avatarURL = null;
       if (profileImage) {
-        // Fixed path to match your storage rules
+        // Upload to Firebase Storage
         const filename = `avatars/${user.uid}/${Date.now()}.${profileImage.name.split('.').pop()}`;
-        const storageRef = projectStorage.ref(filename);
-        const uploadTask = await storageRef.put(profileImage);
-        avatarURL = await uploadTask.ref.getDownloadURL();
+        const storageRef = ref(projectStorage, filename);
+        const uploadResult = await uploadBytes(storageRef, profileImage);
+        avatarURL = await getDownloadURL(uploadResult.ref);
       }
 
-      // Update Firebase Auth profile (for quick access)
-      await user.updateProfile({
-        displayName: `${fname.trim()} ${lname.trim()}`,
-        photoURL: avatarURL || user.photoURL,
-      });
+      const displayName = `${fname.trim()} ${lname.trim()}`;
 
-      const updateData = {
+      // Update Firebase Auth profile using the actual Firebase Auth user
+      // projectAuth.currentUser gives you the real Firebase Auth user object
+      if (projectAuth.currentUser) {
+        await updateProfile(projectAuth.currentUser, {
+          displayName: displayName,
+          photoURL: avatarURL || projectAuth.currentUser.photoURL,
+        });
+      }
+
+      // Save to Firestore - this is what App.jsx checks
+      const profileData = {
         fname: fname.trim(),
         lname: lname.trim(),
-        displayName: `${fname.trim()} ${lname.trim()}`,
+        displayName: displayName,
+        email: user.email,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       if (avatarURL) {
-        updateData.avatar = avatarURL;
-        updateData.photoURL = avatarURL; // Keep consistent
+        profileData.photoURL = avatarURL;
       }
 
-      await projectFirestore.collection('users').doc(user.uid).update(updateData);
+      await setDoc(doc(projectFirestore, 'users', user.uid), profileData, { merge: true });
 
-      window.location.href = '/';
+      // Force a page refresh to trigger the profile check in App.jsx
+      window.location.reload();
     } catch (err) {
       console.error('Profile setup error:', err);
       setError(err.message);
@@ -74,6 +86,7 @@ export default function SetupProfile() {
       setIsPending(false);
     }
   };
+
   return (
     <div className={styles['setup-form-container']}>
       <form onSubmit={handleSubmit} className={styles['setup-form']}>
@@ -83,13 +96,13 @@ export default function SetupProfile() {
             <div className={styles['setup50-50-left']}>
               <label>
                 <span>First Name</span>
-                <input type="text" onChange={(e) => setFname(e.target.value)} value={fname} />
+                <input type="text" onChange={(e) => setFname(e.target.value)} value={fname} required />
               </label>
             </div>
             <div className={styles['setup50-50-right']}>
               <label>
                 <span>Last Name</span>
-                <input type="text" onChange={(e) => setLname(e.target.value)} value={lname} />
+                <input type="text" onChange={(e) => setLname(e.target.value)} value={lname} required />
               </label>
             </div>
           </div>
@@ -97,7 +110,7 @@ export default function SetupProfile() {
           <div className={styles['setup-form-profile-img']}>
             <h3>Profile Photo</h3>
             <img
-              src={imagePreview || user.photoURL || '/default-avatar.jpg'}
+              src={imagePreview || user?.photoURL || '/default-avatar.jpg'}
               alt="Profile"
               className={styles['profile-img']}
             />
@@ -118,7 +131,7 @@ export default function SetupProfile() {
           {!isPending && <button className="btn">Save Changes</button>}
           {isPending && (
             <button className="btn" disabled>
-              Loading
+              Loading...
             </button>
           )}
           {error && <div className={styles.err}>{error}</div>}

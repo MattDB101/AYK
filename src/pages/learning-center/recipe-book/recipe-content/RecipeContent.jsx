@@ -94,7 +94,16 @@ function RecipeContent() {
           descriptionField="description"
         />
 
-        <SlideDeck slideDeckPath={currentRecipe.slideDeckPath} />
+        <SlideDeck slideDeckPath={currentRecipe.slideDeckPath} title="Slides" />
+        <SlideDeck
+          slideDeckPath={`worksheet-slides/${currentRecipe.slideDeckPath?.split('/').slice(1).join('/')}`}
+          title="Worksheet"
+          allowDownload={true}
+        />
+        <SlideDeck
+          slideDeckPath={`recipe-card-slides/${currentRecipe.slideDeckPath?.split('/').slice(1).join('/')}`}
+          title="Recipe Card"
+        />
       </div>
     </div>
   );

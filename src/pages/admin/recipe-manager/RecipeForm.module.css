@@ -223,6 +223,21 @@
   font-weight: 600;
 }
 
+.allergenCheckboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.allergenLabel {
+  font-size: 1rem;
+  color: #4b6737;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .container {

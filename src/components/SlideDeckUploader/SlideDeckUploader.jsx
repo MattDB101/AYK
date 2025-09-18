@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styles from './SlideDeckUploader.module.css';
 
-function SlideDeckUploader({ slides, onSlidesChange }) {
+function SlideDeckUploader({ slides, onSlidesChange, label }) {
   const [dragOver, setDragOver] = useState(false);
+  const inputId = `${label.replace(/\s+/g, '-').toLowerCase()}-file-input`; // unique ID
 
   const handleFileSelect = (files) => {
     const imageFiles = Array.from(files).filter((file) =>
@@ -15,7 +16,7 @@ function SlideDeckUploader({ slides, onSlidesChange }) {
     }
 
     const newSlides = imageFiles.map((file, index) => ({
-      id: Date.now() + index,
+      id: `${label || 'slide'}-${Date.now()}-${index}-${file.name}`,
       file,
       preview: URL.createObjectURL(file),
       name: file.name,
@@ -70,7 +71,9 @@ function SlideDeckUploader({ slides, onSlidesChange }) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h3>Slide Deck ({slides.length} slides)</h3>
+          <h3>
+            {label || 'Slide Deck'} ({slides.length} slides)
+          </h3>
           <p>Upload image files to create a slide deck for this recipe</p>
         </div>
         {slides.length > 0 && (
@@ -90,7 +93,7 @@ function SlideDeckUploader({ slides, onSlidesChange }) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => document.getElementById('slide-file-input').click()}
+        onClick={() => document.getElementById(inputId).click()}
       >
         <div className={styles.uploadContent}>
           <div className={styles.uploadIcon}>📁</div>
@@ -102,7 +105,7 @@ function SlideDeckUploader({ slides, onSlidesChange }) {
           </p>
         </div>
         <input
-          id="slide-file-input"
+          id={inputId}
           type="file"
           multiple
           accept="image/*"
