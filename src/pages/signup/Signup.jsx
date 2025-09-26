@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useSignup } from '../../hooks/useSignup';
 import { projectFirestore } from '../../firebase/config';
 import { Link } from 'react-router-dom';
-
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -154,7 +153,6 @@ export default function Signup() {
               required
             />
           </label>
-
           <div className={styles['signup-link']}>
             <p>
               Already have an account? <Link to="/login">Log in here</Link>

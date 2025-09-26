@@ -29,6 +29,10 @@ import CreateSchool from './pages/admin/school-manager/CreateSchool';
 import EditSchool from './pages/admin/school-manager/EditSchool';
 import EditUser from './pages/admin/user-manager/EditUser';
 import CreateUser from './pages/admin/user-manager/CreateUser';
+import CreateSchool from './pages/admin/school-manager/CreateSchool';
+import EditSchool from './pages/admin/school-manager/EditSchool';
+import EditUser from './pages/admin/user-manager/EditUser';
+import CreateUser from './pages/admin/user-manager/CreateUser';
 import Cart from './pages/orders/cart/Cart';
 
 function App() {
