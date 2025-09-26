@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { useRecipes } from '../../hooks/recipes/useRecipes';
 import { useCart } from '../../context/cartContext';
-import { useNavigate } from 'react-router-dom'; // <-- Add this import
+import { useNavigate } from 'react-router-dom';
 import styles from './orders.module.css';
 import ArrowDown01Icon from '../../components/icons/arrow-down-01-stroke-rounded';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CartIcon from '../../components/icons/cart-icon-stroke';
 
 const FILTERS = ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th Year'];
 
-function Orders() {
+function Order() {
   const { groupedRecipes, loading, error } = useRecipes();
   const { addToCart } = useCart();
-  const navigate = useNavigate(); // <-- Add this line
+  const navigate = useNavigate();
   const [activeFilters, setActiveFilters] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
@@ -202,9 +203,9 @@ function Orders() {
             </div>
           </div>
         </div>
-        <button className={`${styles.btn} ${styles.viewCartBtn}`} onClick={() => navigate('/orders/cart')}>
-          View Basket
-        </button>
+        <div className={`${styles.basketBtn} ${styles.viewCartBtn}`} onClick={() => navigate('/order/cart')}>
+          <CartIcon /> <span>View Basket</span>
+        </div>
       </div>
 
       {/* Step 02: Select Recipes */}
@@ -294,4 +295,4 @@ function Orders() {
   );
 }
 
-export default Orders;
+export default Order;

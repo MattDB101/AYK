@@ -3,8 +3,7 @@ import RecipeManager from './recipe-manager/RecipeManager';
 import SchoolManager from './school-manager/SchoolManager';
 import GeneralLearningManager from './general-learning-manager/GeneralLearningManager';
 import RecipeBookManager from './recipe-book-manager/RecipeBookManager';
-import TeacherManager from './teacher-manager/TeacherManager';
-import ClassManager from './class-manager/ClassManager';
+import UserManager from './user-manager/UserManager';
 import styles from './AdminPanel.module.css';
 
 function AdminPanel() {
@@ -14,8 +13,7 @@ function AdminPanel() {
     { id: 'recipes', label: 'Recipes', component: RecipeManager },
     { id: 'general-learning', label: 'General Learning', component: GeneralLearningManager },
     { id: 'schools', label: 'Schools', component: SchoolManager },
-    { id: 'teachers', label: 'Teachers', component: TeacherManager },
-    { id: 'classes', label: 'Classes', component: ClassManager },
+    { id: 'users', label: 'Users', component: UserManager },
     { id: 'recipe-book', label: 'Recipe Book', component: RecipeBookManager },
   ];
 

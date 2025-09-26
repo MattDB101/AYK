@@ -21,15 +21,20 @@
   gap: 0px;
   align-items: last baseline;
 }
-.btn {
+.basketBtn {
   transition: background 0.3s, color 0.3s;
   padding: 12px 24px;
   border-radius: 30px;
   font-size: 1.2rem;
   cursor: pointer;
   font-family: 'Bitter';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
-.btn:hover {
+
+.basketBtn:hover {
   opacity: 0.9;
 }
 .orderButtonsContainer {
@@ -49,7 +54,7 @@
   border: none;
   border-radius: 24px;
   padding: 8px 24px;
-  font-size: 1.5rem;
+
   cursor: pointer;
 }
 

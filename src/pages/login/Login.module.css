@@ -73,8 +73,31 @@
   text-transform: capitalize;
   font-weight: normal;
   border: 1px solid #555;
-  margin: auto !important;
-  margin-left: 100px;
-  padding: 20px 30px;
-  float: right;
+  margin: auto;
+  margin-top: 20px !important;
+  padding: 20px 50px;
+}
+
+/* Add this to your existing Login.module.css */
+.signup-link {
+  text-align: left;
+  width: fit-content;
+  clear: both;
+}
+
+.signup-link p {
+  font-family: 'Bitter', serif;
+  color: #666;
+  font-size: 0.8em;
+  margin: 0;
+}
+
+.signup-link a {
+  color: #4b6737;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
 }

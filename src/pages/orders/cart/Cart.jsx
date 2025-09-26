@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useOrder } from '../../../hooks/useOrder';
 
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th Year'];
 
 function Cart() {
   const { cart, removeFromCart, clearCart, updateQty, updateNotes, updateDate, updateYear } = useCart();
   const navigate = useNavigate();
+  const { createOrder } = useOrder();
 
   const increaseQty = (item) => {
     updateQty(item, (item.qty || 1) + 1);
@@ -28,9 +30,19 @@ function Cart() {
     return day !== 0 && day !== 6;
   };
 
+  const handleConfirmOrder = async () => {
+    try {
+      await createOrder(cart);
+      clearCart();
+      alert('Order placed successfully!');
+    } catch (err) {
+      alert('Error placing order: ' + err.message);
+    }
+  };
+
   return (
     <div className={styles.cartContainer}>
-      <button className={styles.backButton} onClick={() => navigate('/orders')}>
+      <button className={styles.backButton} onClick={() => navigate('/order')}>
         ← Return to Ordering Page
       </button>
       <div className={styles.cartBox}>
@@ -104,7 +116,7 @@ function Cart() {
         </LocalizationProvider>
         {cart.length > 0 && <button onClick={clearCart}>Clear Cart</button>}
         <div className={styles.cartCheckoutRow}>
-          <button className={styles.cartCheckoutBtn}>
+          <button className={styles.cartCheckoutBtn} onClick={handleConfirmOrder}>
             Confirm Order <span style={{ fontSize: '1.3em' }}>&rarr;</span>
           </button>
         </div>

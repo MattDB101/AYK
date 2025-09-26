@@ -28,11 +28,11 @@ export const useSignup = () => {
     }
   };
 
-  const signup = async (email, password, school, county) => {
+  const signup = async (email, password, school, county, userType) => {
     console.log('Signing up with:', { email, password, school, county });
     setError(null);
     setIsPending(true);
-
+    console.log(email);
     try {
       // Create user with email and password
       const res = await projectAuth.createUserWithEmailAndPassword(email, password);
@@ -52,7 +52,7 @@ export const useSignup = () => {
           fname: '',
           lname: '',
           avatar: '',
-          role: 'teacher',
+          role: userType,
           createdAt: new Date(),
         });
 
@@ -62,14 +62,17 @@ export const useSignup = () => {
         setIsPending(false);
         setError(null);
       }
+
+      // Return the user object
+      return res.user;
     } catch (err) {
       if (!isCancelled) {
         console.log(err.message);
-
         const customError = getErrorMessage(err.code);
         setError(customError);
         setIsPending(false);
       }
+      throw err; // Re-throw error so Signup.jsx can catch it
     }
   };
 
