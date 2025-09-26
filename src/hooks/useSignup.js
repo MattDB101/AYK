@@ -32,7 +32,7 @@ export const useSignup = () => {
     console.log('Signing up with:', { email, password, school, county });
     setError(null);
     setIsPending(true);
-
+    console.log(email);
     try {
       // Create user with email and password
       const res = await projectAuth.createUserWithEmailAndPassword(email, password);
@@ -62,14 +62,17 @@ export const useSignup = () => {
         setIsPending(false);
         setError(null);
       }
+
+      // Return the user object
+      return res.user;
     } catch (err) {
       if (!isCancelled) {
         console.log(err.message);
-
         const customError = getErrorMessage(err.code);
         setError(customError);
         setIsPending(false);
       }
+      throw err; // Re-throw error so Signup.jsx can catch it
     }
   };
 

@@ -3,7 +3,9 @@ import styles from './SlideDeckUploader.module.css';
 
 function SlideDeckUploader({ slides, onSlidesChange, label }) {
   const [dragOver, setDragOver] = useState(false);
-  const inputId = `${label.replace(/\s+/g, '-').toLowerCase()}-file-input`; // unique ID
+  const inputId = `${
+    label ? label.replace(/\s+/g, '-').toLowerCase() : ''
+  }-file-input`; // unique ID
 
   const handleFileSelect = (files) => {
     const imageFiles = Array.from(files).filter((file) =>

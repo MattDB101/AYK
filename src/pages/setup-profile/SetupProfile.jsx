@@ -75,7 +75,7 @@ export default function SetupProfile() {
         profileData.photoURL = avatarURL;
       }
 
-      await setDoc(doc(projectFirestore, 'users', user.uid), profileData, { merge: true });
+      await setDoc(doc(projectFirestore, 'teachers', user.uid), profileData, { merge: true });
 
       // Force a page refresh to trigger the profile check in App.jsx
       window.location.reload();

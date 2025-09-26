@@ -2,198 +2,147 @@ import styles from './Signup.module.css';
 import React from 'react';
 import { useState } from 'react';
 import { useSignup } from '../../hooks/useSignup';
-import { useSchools } from '../../hooks/useSchools';
-import Select from 'react-select';
-
+import { projectFirestore } from '../../firebase/config';
+import { Link } from 'react-router-dom';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [county, setCounty] = useState(null);
-  const [school, setSchool] = useState(null); // Changed to null for Select component
   const [validationError, setValidationError] = useState(null);
+  const [isCheckingTeacher, setIsCheckingTeacher] = useState(false);
 
   const { signup, error, isPending } = useSignup();
-  const { schools, isLoading: schoolsLoading, error: schoolsError } = useSchools(county);
 
-  const countyOptions = [
-    { value: 'antrim', label: 'Antrim' },
-    { value: 'armagh', label: 'Armagh' },
-    { value: 'carlow', label: 'Carlow' },
-    { value: 'cavan', label: 'Cavan' },
-    { value: 'clare', label: 'Clare' },
-    { value: 'cork', label: 'Cork' },
-    { value: 'derry', label: 'Derry' },
-    { value: 'donegal', label: 'Donegal' },
-    { value: 'down', label: 'Down' },
-    { value: 'dublin', label: 'Dublin' },
-    { value: 'fermanagh', label: 'Fermanagh' },
-    { value: 'galway', label: 'Galway' },
-    { value: 'kerry', label: 'Kerry' },
-    { value: 'kildare', label: 'Kildare' },
-    { value: 'kilkenny', label: 'Kilkenny' },
-    { value: 'laois', label: 'Laois' },
-    { value: 'leitrim', label: 'Leitrim' },
-    { value: 'limerick', label: 'Limerick' },
-    { value: 'longford', label: 'Longford' },
-    { value: 'louth', label: 'Louth' },
-    { value: 'mayo', label: 'Mayo' },
-    { value: 'meath', label: 'Meath' },
-    { value: 'monaghan', label: 'Monaghan' },
-    { value: 'offaly', label: 'Offaly' },
-    { value: 'roscommon', label: 'Roscommon' },
-    { value: 'sligo', label: 'Sligo' },
-    { value: 'tipperary', label: 'Tipperary' },
-    { value: 'tyrone', label: 'Tyrone' },
-    { value: 'waterford', label: 'Waterford' },
-    { value: 'westmeath', label: 'Westmeath' },
-    { value: 'wexford', label: 'Wexford' },
-    { value: 'wicklow', label: 'Wicklow' },
-  ];
+  const checkTeacherRecord = async (email) => {
+    try {
+      const teacherQuery = await projectFirestore.collection('teachers').where('email', '==', email).get();
 
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      fontSize: '1em',
-      color: '#777',
-      borderRadius: '10px',
-      backgroundColor: '#f3f2e6',
-      border: '2px solid #555',
-      boxShadow: 'none',
-      minHeight: '0px',
-      '&:hover': {
-        border: '2px solid #555',
-      },
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: '#777',
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: '#777',
-    }),
-    menu: (provided) => ({
-      ...provided,
-      borderRadius: '10px',
-      border: '2px solid #555',
-      backgroundColor: '#4b6737',
-      maxHeight: '200px',
-      overflowY: 'auto',
-      width: '70%',
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isHovered ? '#f3f2e6' : '#4b6737',
-      color: 'white',
-      fontFamily: "'Bitter', serif",
-    }),
+      if (!teacherQuery.empty) {
+        return teacherQuery.docs[0]; // Return the teacher document
+      }
+      return null;
+    } catch (error) {
+      console.error('Error checking teacher record:', error);
+      throw error;
+    }
   };
 
-  // Handle county change and reset school selection
-  const handleCountyChange = (selectedCounty) => {
-    setCounty(selectedCounty.value);
-    setSchool(null);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (email !== confirmEmail || confirmEmail == '') {
-      setValidationError("There's an issue with your email!");
+    if (password !== confirmPassword || confirmPassword === '') {
+      setValidationError("Passwords don't match!");
       return;
     }
 
-    if (password !== confirmPassword || confirmPassword == '') {
-      setValidationError("There's an issue with your password!");
-      return;
-    }
-
-    if (!county) {
-      setValidationError('Please select a county!');
-      return;
-    }
-
-    if (!school) {
-      setValidationError('Please select a school!');
+    if (password.length < 6) {
+      setValidationError('Password must be at least 6 characters!');
       return;
     }
 
     setValidationError(null);
-    signup(email, password, schools[0].value, county);
+    setIsCheckingTeacher(true);
+
+    try {
+      // Check if teacher record exists
+      const teacherDoc = await checkTeacherRecord(email);
+
+      if (!teacherDoc) {
+        setValidationError('No teacher record found for this email. Please contact your administrator.');
+        setIsCheckingTeacher(false);
+        return;
+      }
+
+      const teacherData = teacherDoc.data();
+
+      // Check if account was already created
+      if (teacherData.accountCreated) {
+        setValidationError('An account has already been created for this email.');
+        setIsCheckingTeacher(false);
+        return;
+      }
+
+      // Use the teacher's assigned data from the database
+      const finalCounty = teacherData.county || '';
+      const finalSchoolId = teacherData.schoolId || '';
+
+      // Proceed with signup using data from teacher record
+      const user = await signup(email, password, finalSchoolId, finalCounty);
+
+      if (user) {
+        // Update the teacher record to mark account as created and link to user
+        await projectFirestore.collection('teachers').doc(teacherDoc.id).update({
+          accountCreated: true,
+          userId: user.uid,
+          updatedAt: new Date(),
+        });
+      }
+    } catch (error) {
+      setValidationError('Error during signup: ' + error.message);
+    } finally {
+      setIsCheckingTeacher(false);
+    }
   };
+
+  const isFormDisabled = isPending || isCheckingTeacher;
 
   return (
     <div className={styles['signup-form-container']}>
+      <img src="/AYK50.png" alt="logo" />
       <form onSubmit={handleSubmit} className={styles['signup-form']}>
         <div className={styles['signup-form-contents']}>
           <h2>Create your account</h2>
-          <div className={styles['signup50-50']}>
-            <div className={styles['signup50-50-left']}>
-              <label>
-                <span>Select County</span>
-                <Select
-                  options={countyOptions}
-                  value={countyOptions.find((option) => option.value === county)} // Find the full object
-                  onChange={handleCountyChange}
-                  placeholder="Choose a county..."
-                  isSearchable
-                  styles={customStyles}
-                  className={styles['react-select-container']}
-                  classNamePrefix="react-select"
-                />
-              </label>
-              <label>
-                <span>Select School</span>
-                <Select
-                  options={schools}
-                  value={school}
-                  onChange={setSchool}
-                  placeholder={
-                    county ? (schoolsLoading ? 'Loading schools...' : 'Choose a school...') : 'Select county first'
-                  }
-                  isSearchable
-                  isDisabled={!county || schoolsLoading}
-                  isLoading={schoolsLoading}
-                  styles={customStyles}
-                  className={styles['react-select-container']}
-                  classNamePrefix="react-select"
-                  noOptionsMessage={() =>
-                    county ? 'No schools found for this county' : 'Please select a county first'
-                  }
-                />
-                {schoolsError && <span style={{ color: 'red', fontSize: '0.8em' }}>Error loading schools</span>}
-              </label>
-            </div>
-            <div className={styles['signup50-50-right']}>
-              <label>
-                <span>Email</span>
-                <input type="email" onChange={(e) => setEmail(e.target.value)} value={email} />
-              </label>
+          <p className={styles['signup-subtitle']}>Please use the email address provided by your administrator</p>
 
-              <label>
-                <span>Confirm Email</span>
-                <input type="email" onChange={(e) => setConfirmEmail(e.target.value)} value={confirmEmail} />
-              </label>
+          <label>
+            <span>Email</span>
+            <input
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              disabled={isFormDisabled}
+              placeholder="Enter your email address"
+              required
+            />
+          </label>
 
-              <label>
-                <span>Password</span>
-                <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} />
-              </label>
+          <label>
+            <span>Password</span>
+            <input
+              type="password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              disabled={isFormDisabled}
+              placeholder="Enter your password"
+              minLength="6"
+              required
+            />
+          </label>
 
-              <label>
-                <span>Confirm Password</span>
-                <input type="password" onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
-              </label>
-            </div>
+          <label>
+            <span>Confirm Password</span>
+            <input
+              type="password"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={confirmPassword}
+              disabled={isFormDisabled}
+              placeholder="Confirm your password"
+              minLength="6"
+              required
+            />
+          </label>
+          <div className={styles['signup-link']}>
+            <p>
+              Already have an account? <Link to="/login">Log in here</Link>
+            </p>
           </div>
-          {!isPending && <button className="btn">Sign up</button>}
-          {isPending && (
+          {!isFormDisabled && <button className="btn">Create Account</button>}
+          {isFormDisabled && (
             <button className="btn" disabled>
-              Loading
+              {isCheckingTeacher ? 'Verifying teacher record...' : 'Creating account...'}
             </button>
           )}
+
           {error && <div className={styles.err}>{error}</div>}
           {validationError && <div className={styles.err}>{validationError}</div>}
         </div>
