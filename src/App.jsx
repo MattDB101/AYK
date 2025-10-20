@@ -29,11 +29,12 @@ import CreateSchool from './pages/admin/school-manager/CreateSchool';
 import EditSchool from './pages/admin/school-manager/EditSchool';
 import EditUser from './pages/admin/user-manager/EditUser';
 import CreateUser from './pages/admin/user-manager/CreateUser';
-import CreateSchool from './pages/admin/school-manager/CreateSchool';
-import EditSchool from './pages/admin/school-manager/EditSchool';
-import EditUser from './pages/admin/user-manager/EditUser';
-import CreateUser from './pages/admin/user-manager/CreateUser';
 import Cart from './pages/orders/cart/Cart';
+import UploadedLearningManager from './pages/learning-center/uploaded-learning/UploadedLearningManager';
+import CreateUploadedLearning from './pages/learning-center/uploaded-learning/CreateUploadedLearning';
+import EditUploadedLearning from './pages/learning-center/uploaded-learning/EditUploadedLearning';
+import TeacherLearning from './pages/learning-center/uploaded-learning/TeacherContent/TeacherLearning';
+import TeacherLearningContent from './pages/learning-center/uploaded-learning/TeacherContent/TeacherLearningContent';
 
 function App() {
   const { user, authIsReady } = useAuthContext();
@@ -121,6 +122,11 @@ function App() {
 
                   <Route path="learning/general/:generalLearningId" element={<GeneralLearningContent />} />
                   <Route path="learning" element={<LearningCenter />} />
+                  <Route path="learning/teacher-content" element={<TeacherLearning />} />
+                  <Route path="learning/teacher-content/:uploadedLearningId" element={<TeacherLearningContent />} />
+                  <Route path="learning/upload" element={<UploadedLearningManager />} />
+                  <Route path="learning/upload/create" element={<CreateUploadedLearning />} />
+                  <Route path="learning/upload/edit/:uploadedLearningId" element={<EditUploadedLearning />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="forum" element={<Forum />} />
                   <Route path="orders/cart" element={<Cart />} />

@@ -1,19 +1,46 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+exports.setTeacherRoleOnAccountCreated = functions.firestore
+  .document('teachers/{docId}')
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const userId = after.userId; 
+    const schoolId = after.schoolId;
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+    if (!before.accountCreated && after.accountCreated && userId) {
+      try {
+        await admin.auth().getUser(userId);
+        await admin.auth().setCustomUserClaims(userId, { role: 'teacher', schoolId });
+        console.log(`Set teacher role for user ${userId}`);
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      }
+    }
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    return null;
+  });
+
+exports.setStudentRoleOnAccountCreated = functions.firestore
+  .document('students/{docId}')
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const userId = after.userId;
+    const schoolId = after.schoolId;
+    const classId = after.classId;
+
+    if (!before.accountCreated && after.accountCreated && userId) {
+      try {
+        await admin.auth().getUser(userId);
+        await admin.auth().setCustomUserClaims(userId, { role: 'student', schoolId, classId });
+        console.log(`Set student role, schoolId, and classId for user ${userId}`);
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      }
+    }
+
+    return null;
+  });

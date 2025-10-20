@@ -27,10 +27,13 @@ export const AuthContextProvider = ({ children }) => {
     const unsub = onAuthStateChanged(projectAuth, async (user) => {
       if (user) {
         try {
-          // Get the ID token with custom claims
-          const tokenResult = await user.getIdTokenResult();
+          let tokenResult = await user.getIdTokenResult();
 
-          // Create user object with custom claims
+          if (!tokenResult.claims.schoolId) {
+            await user.getIdToken(true);
+            tokenResult = await user.getIdTokenResult();
+          }
+
           const userData = {
             uid: user.uid,
             email: user.email,
@@ -38,16 +41,16 @@ export const AuthContextProvider = ({ children }) => {
             emailVerified: user.emailVerified,
             photoURL: user.photoURL,
             phoneNumber: user.phoneNumber,
-            // Custom claims are available here!
             isAdmin: tokenResult.claims.isAdmin || false,
             role: tokenResult.claims.role || 'student',
+            schoolId: tokenResult.claims.schoolId,
+            classId: tokenResult.claims.classId,
           };
 
           console.log('User with custom claims:', userData);
           dispatch({ type: 'AUTH_IS_READY', payload: userData });
         } catch (error) {
           console.error('Error getting custom claims:', error);
-          // Fallback without custom claims
           dispatch({
             type: 'AUTH_IS_READY',
             payload: {
@@ -59,6 +62,8 @@ export const AuthContextProvider = ({ children }) => {
               phoneNumber: user.phoneNumber,
               isAdmin: false,
               role: 'student',
+              schoolId: undefined,
+              classId: undefined,
             },
           });
         }

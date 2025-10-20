@@ -38,6 +38,14 @@ const IRISH_COUNTIES = [
   'Wicklow',
 ];
 
+const WEEKDAYS = [
+  { key: 'monday', label: 'Monday' },
+  { key: 'tuesday', label: 'Tuesday' },
+  { key: 'wednesday', label: 'Wednesday' },
+  { key: 'thursday', label: 'Thursday' },
+  { key: 'friday', label: 'Friday' },
+];
+
 function CreateSchool() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -46,6 +54,13 @@ function CreateSchool() {
     county: '',
     phone: '',
     email: '',
+    deliveryDays: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+    },
   });
   const [classes, setClasses] = useState([]);
   const [showAddClass, setShowAddClass] = useState(false);
@@ -61,6 +76,16 @@ function CreateSchool() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleDeliveryDayChange = (day) => {
+    setFormData((prev) => ({
+      ...prev,
+      deliveryDays: {
+        ...prev.deliveryDays,
+        [day]: !prev.deliveryDays[day],
+      },
     }));
   };
 
@@ -114,7 +139,7 @@ function CreateSchool() {
       }
 
       alert('School created successfully!');
-      navigate('/admin');
+      navigate('/admin/schools');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -123,7 +148,7 @@ function CreateSchool() {
   };
 
   const handleCancel = () => {
-    navigate('/admin');
+    navigate('/admin/schools');
   };
 
   return (
@@ -219,6 +244,28 @@ function CreateSchool() {
                 placeholder="Enter email address"
               />
             </div>
+          </div>
+
+          {/* Delivery Days Section */}
+          <div className={styles.formGroup}>
+            <label>Delivery Days</label>
+            <div className={styles.checkboxGroup}>
+              {WEEKDAYS.map((day) => (
+                <label key={day.key} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={formData.deliveryDays[day.key]}
+                    onChange={() => handleDeliveryDayChange(day.key)}
+                    disabled={loading}
+                    className={styles.checkbox}
+                  />
+                  <span>{day.label}</span>
+                </label>
+              ))}
+            </div>
+            <small style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+              Select the days when meals can be delivered to this school
+            </small>
           </div>
 
           {/* Classes Section */}

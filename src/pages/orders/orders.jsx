@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRecipes } from '../../hooks/recipes/useRecipes';
 import { useCart } from '../../context/cartContext';
+import { useSchoolDeliveryDays } from '../../hooks/useSchoolDeliveryDays'; // Add this import
 import { useNavigate } from 'react-router-dom';
 import styles from './orders.module.css';
 import ArrowDown01Icon from '../../components/icons/arrow-down-01-stroke-rounded';
@@ -15,6 +16,7 @@ const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th 
 function Order() {
   const { groupedRecipes, loading, error } = useRecipes();
   const { addToCart } = useCart();
+  const { deliveryDays, loading: deliveryLoading, error: deliveryError, isDayAllowed } = useSchoolDeliveryDays(); // Add this
   const navigate = useNavigate();
   const [activeFilters, setActiveFilters] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -91,6 +93,31 @@ function Order() {
     });
   };
 
+  // Custom shouldDisableDate function
+  const shouldDisableDate = (date) => {
+    // If delivery days are still loading or there's an error, disable all dates
+    if (deliveryLoading || deliveryError || !deliveryDays) {
+      return true;
+    }
+
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+    // Disable weekends (Saturday = 6, Sunday = 0)
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      return true;
+    }
+
+    // Disable past dates
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date < today) {
+      return true;
+    }
+
+    // Check if this day is allowed for delivery based on school settings
+    return !isDayAllowed(dayOfWeek);
+  };
+
   return (
     <div className={styles.ordersContainer}>
       {/* Step 01: Select Class */}
@@ -132,21 +159,20 @@ function Order() {
                   value={selectedDate}
                   onChange={setSelectedDate}
                   format="dd-MM-yyyy"
+                  disabled={deliveryLoading || deliveryError || !deliveryDays} // Disable if loading or error
                   slotProps={{
                     textField: {
                       size: 'small',
                       className: styles.orderDateInput,
                       variant: 'outlined',
-                      placeholder: 'DD-MM-YYYY',
+                      placeholder: deliveryLoading ? 'Loading...' : deliveryError ? 'No dates available' : 'DD-MM-YYYY',
                       InputLabelProps: { style: { color: '#588157', fontFamily: 'Bitter', fontWeight: 600 } },
                       sx: {
                         background: '#ffffff',
                         borderRadius: '32px',
                         fontFamily: 'Bitter',
                         color: '#588157',
-
                         width: '200px',
-
                         '& input': {
                           padding: '6px 6px 8px 18px',
                           fontSize: '1.2rem',
@@ -156,10 +182,8 @@ function Order() {
                         },
                         '& .MuiOutlinedInput-root': {
                           borderRadius: '32px',
-
                           '& fieldset': {
                             borderColor: '#588157',
-
                             borderWidth: '3px',
                           },
                           '&:hover fieldset': {
@@ -172,19 +196,27 @@ function Order() {
                         '& .MuiInputLabel-root': {
                           color: '#588157',
                           fontFamily: 'Bitter',
-
                           fontWeight: 600,
                         },
                       },
                     },
                   }}
-                  shouldDisableDate={(date) => {
-                    // Example: Only allow weekdays (Mon-Fri)
-                    const day = date.getDay();
-                    return day === 0 || day === 6;
-                  }}
+                  shouldDisableDate={shouldDisableDate} // Use our custom function
                 />
               </LocalizationProvider>
+              {/* Show delivery error if any */}
+              {deliveryError && (
+                <div
+                  style={{
+                    color: '#d32f2f',
+                    fontSize: '0.75rem',
+                    marginTop: '4px',
+                    fontFamily: 'Bitter',
+                  }}
+                >
+                  {deliveryError}
+                </div>
+              )}
               <div className={styles.cartQtySection}>
                 <div className={styles.qtyLabel}>Qty:</div>
 
