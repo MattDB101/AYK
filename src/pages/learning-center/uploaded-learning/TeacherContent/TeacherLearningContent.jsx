@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocument } from '../../../../hooks/useDocument';
-import { useTeacherLearningContent } from '../../../../hooks/uploaded-learning/useTeacherLearningContent'; // <-- import the hook
+import { useTeacherLearningContent } from '../../../../hooks/uploaded-learning/useTeacherLearningContent';
 import { AuthContext } from '../../../../context/AuthContext';
 import Carousel from '../../../../components/Carousel/Carousel';
 import SlideDeck from '../../../../components/SlideDeck/SlideDeck';
@@ -12,7 +12,7 @@ function TeacherLearningContent() {
   const navigate = useNavigate();
   const { uploadedLearningId } = useParams();
   const { user } = useContext(AuthContext);
-  console.log(`uploaded-learning/${user?.schoolId}/learning-content/${uploadedLearningId}`);
+
   // Fetch the main learning content document
   const {
     document: currentLearningContent,
@@ -20,12 +20,26 @@ function TeacherLearningContent() {
     error: contentError,
   } = useDocument(`uploaded-learning/${user?.schoolId}/learning-content`, uploadedLearningId);
 
-  // Use the teacher learning content hook to get all relevant content for this user
-  const { learningContent, loading: resourcesLoading, error: resourcesError } = useTeacherLearningContent();
+  // Use the hook with the content ID
+  const {
+    learningContent,
+    tips,
+    videos,
+    loading: resourcesLoading,
+    error: resourcesError,
+  } = useTeacherLearningContent(uploadedLearningId);
+  console.log(tips);
 
   const handleContentClick = (contentId) => {
-    console.log('Clicked content:', contentId);
-    // navigate(`/learning/general/${docId}/content/${contentId}`);
+    // Find the content item by ID in tips or videos
+    const allContent = [...tips, ...videos];
+    const contentItem = allContent.find((item) => item.id === contentId);
+
+    if (contentItem && contentItem.url) {
+      window.open(contentItem.url, '_blank'); // Open the URL in a new tab
+    } else {
+      console.log('No URL found for content:', contentId);
+    }
   };
 
   // Loading state - wait for both learning content and resources to load
@@ -71,9 +85,6 @@ function TeacherLearningContent() {
     );
   }
 
-  // Filter the fetched learningContent to only show the current docId's content
-  const currentContent = learningContent.find((item) => item.id === uploadedLearningId) || {};
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -86,7 +97,7 @@ function TeacherLearningContent() {
       <div className={styles.content}>
         <Carousel
           title="Videos"
-          items={currentContent.videos || []}
+          items={videos}
           onItemClick={handleContentClick}
           buttonText="Watch"
           imageField="thumbnailUrl"
@@ -96,7 +107,7 @@ function TeacherLearningContent() {
 
         <Carousel
           title="Tips"
-          items={[...(currentContent.tips || [])].reverse()}
+          items={[...tips].reverse()}
           onItemClick={handleContentClick}
           imageField="thumbnailUrl"
           titleField="title"

@@ -295,10 +295,10 @@ export const useUploadedLearningManager = () => {
         .doc(id)
         .update(updateData);
 
-      // Handle content updates with proper thumbnail cleanup
+      // Handle content updates with proper thumbnail preservation & cleanup
       if (content.length > 0) {
-        // Delete all existing content first (with thumbnail cleanup)
-        const existingContent = await projectFirestore
+        // Fetch existing content docs
+        const existingContentSnapshot = await projectFirestore
           .collection('uploaded-learning')
           .doc(user.schoolId)
           .collection('learning-content')
@@ -306,13 +306,61 @@ export const useUploadedLearningManager = () => {
           .collection('content')
           .get();
 
-        for (const doc of existingContent.docs) {
-          const data = doc.data();
-          await deleteContent(id, doc.id, data.thumbnailStoragePath);
+        const existingContent = {};
+        existingContentSnapshot.docs.forEach((doc) => {
+          existingContent[doc.id] = doc.data();
+        });
+
+        // First upload any new thumbnails and clean up file objects
+        const processedContent = await uploadContentThumbnails(id, content);
+
+        for (const item of processedContent) {
+          // Start with item data returned from uploadContentThumbnails
+          let itemData = { ...item };
+
+          // Preserve existing thumbnail if no new thumbnail was uploaded for this item
+          if (existingContent[item.id] && (!itemData.thumbnailStoragePath || itemData.thumbnailStoragePath === '')) {
+            itemData.thumbnailUrl = existingContent[item.id].thumbnailUrl;
+            itemData.thumbnailStoragePath = existingContent[item.id].thumbnailStoragePath;
+          }
+
+          // If a new thumbnail was uploaded and an old thumbnail exists, delete the old one
+          if (
+            itemData.thumbnailStoragePath &&
+            existingContent[item.id] &&
+            existingContent[item.id].thumbnailStoragePath &&
+            existingContent[item.id].thumbnailStoragePath !== itemData.thumbnailStoragePath
+          ) {
+            try {
+              const oldThumbRef = ref(projectStorage, existingContent[item.id].thumbnailStoragePath);
+              await deleteObject(oldThumbRef);
+            } catch (err) {
+              console.warn('Could not delete old thumbnail:', err);
+            }
+          }
+
+          // Ensure no File/Blob objects are saved to Firestore
+          if ('thumbnailFile' in itemData) {
+            delete itemData.thumbnailFile;
+          }
+
+          // Save/update the content document (merge to avoid overwriting other fields)
+          await projectFirestore
+            .collection('uploaded-learning')
+            .doc(user.schoolId)
+            .collection('learning-content')
+            .doc(id)
+            .collection('content')
+            .doc(item.id.toString())
+            .set(itemData, { merge: true });
         }
 
-        // Save new content
-        await saveContent(id, content);
+        // Delete any items that were removed (and their thumbnails)
+        for (const existingId of Object.keys(existingContent)) {
+          if (!processedContent.find((item) => item.id.toString() === existingId)) {
+            await deleteContent(id, existingId, existingContent[existingId].thumbnailStoragePath);
+          }
+        }
       }
 
       setLoading(false);

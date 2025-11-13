@@ -35,6 +35,7 @@ import CreateUploadedLearning from './pages/learning-center/uploaded-learning/Cr
 import EditUploadedLearning from './pages/learning-center/uploaded-learning/EditUploadedLearning';
 import TeacherLearning from './pages/learning-center/uploaded-learning/TeacherContent/TeacherLearning';
 import TeacherLearningContent from './pages/learning-center/uploaded-learning/TeacherContent/TeacherLearningContent';
+import OrderDetails from './pages/admin/orders-manager/order-details/OrderDetails';
 
 function App() {
   const { user, authIsReady } = useAuthContext();
@@ -142,6 +143,7 @@ function App() {
                     <Route path="users/create" element={<CreateUser />} />
                     <Route path="users/edit/:userId" element={<EditUser />} />
                     <Route path="recipes/edit/:recipeId" element={<EditRecipe />} />
+                    <Route path="orders/:orderId" element={<OrderDetails />} />
                   </Route>
                 </Route>
                 <Route path="*" element={<Navigate to="/" />} />

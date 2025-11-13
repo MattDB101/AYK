@@ -298,6 +298,46 @@
   font-weight: 600;
 }
 
+.statusHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 12px;
+  color: #2b2b2b;
+  font-size: 0.95rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-transform: lowercase;
+}
+
+/* pending -> orange */
+.statusPending {
+  background: #fff4e6;
+  color: #b85a00;
+  border: 1px solid rgba(184, 90, 0, 0.08);
+}
+
+/* complete -> green */
+.statusComplete {
+  background: #e6ffef;
+  color: #0b7a2a;
+  border: 1px solid rgba(11, 122, 42, 0.08);
+}
+
+/* fallback style (other statuses) */
+.statusBadge:not(.statusPending):not(.statusComplete) {
+  background: #f4f6f8;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
 /* Responsive design */
 @media (max-width: 1024px) {
   .table {

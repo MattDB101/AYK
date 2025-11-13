@@ -279,20 +279,20 @@
   color: #666;
   font-family: 'Bitter';
 }
-.yearDropdownContainer {
+.classDropdownContainer {
   display: flex;
   align-items: center;
   flex-direction: column;
   gap: 5px;
 }
 
-.yearDropdownLabel {
+.classDropdownLabel {
   font-weight: 500;
   color: #4b6737;
   font-size: 1.1rem;
 }
 
-.yearDropdown {
+.classDropdown {
   background: #fff;
   color: #588157;
   border: 3px solid #588157;
@@ -309,7 +309,7 @@
   min-width: 120px;
 }
 
-.yearDropdown option {
+.classDropdown option {
   color: #466a2e;
   background: #fff;
 }
@@ -355,7 +355,7 @@
   animation: shake 0.5s;
 }
 
-.yearDropdownError {
+.classDropdownError {
   border: 2px solid #dc3545 !important;
   color: #dc3545 !important;
   box-shadow: 0 0 0 2px #ffeaea;
@@ -399,7 +399,7 @@
   color: #222;
   margin-left: 0.7em;
 }
-.yearAndDateRow {
+.classAndDateRow {
   display: flex;
   align-items: center;
   gap: 24px;

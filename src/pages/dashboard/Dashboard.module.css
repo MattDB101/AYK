@@ -1,3 +1,433 @@
-body {
+.dashboardContainer {
+  display: flex;
+  height: 100vh;
   background-color: #fffcf8;
+}
+
+.centerDashboard {
+  margin: 30px auto;
+  padding: 0 80px;
+  display: flex;
+  width: 95%;
+  flex-direction: column;
+  color: #23421f;
+}
+
+.rightMenu {
+  width: 1050px;
+  background-color: #588157;
+}
+
+.header {
+  font-family: 'Bitter', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.welcome {
+  margin: 0 0 6px 0;
+  font-size: 2.5rem;
+  color: #2b5b2e;
+}
+
+.sub {
+  margin-top: 20px;
+  margin-bottom: 6px;
+  color: #000000;
+  font-size: 1.5rem;
+}
+
+.switchClass {
+  background: #4b6737;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-family: 'Bitter', sans-serif;
+  font-weight: 600;
+  padding: 14px 18px; /* slightly smaller vertical padding for selects */
+  border-radius: 35px;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  /* remove native select styling so background arrow works */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* reserve space for the custom caret on the right */
+  padding-right: 44px;
+
+  /* custom caret (white) placed to the right */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
+/* ensure <select> inherits the styling correctly in some browsers */
+select.switchClass {
+  line-height: 1;
+  /* remove inner focus outline but keep accessible focus styles via box-shadow */
+  outline: none;
+}
+
+.switchClass:focus {
+  box-shadow: 0 0 0 3px rgba(87, 131, 71, 0.18);
+  /* keep the background/caret intact on focus */
+}
+
+.card {
+  background: #fff;
+  margin: 40px 0;
+  border: 1px solid #66666644;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(23, 36, 24, 0.06);
+}
+
+.deliveryCardContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.deliveryCardImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deliveryCardImage img {
+  max-width: 330px;
+  padding-right: 0px;
+  margin: auto;
+}
+.cardTitle {
+  display: flex;
+  font-size: 1.75rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.help {
+  background: #2b5b2e;
+  color: white;
+  font-weight: 600;
+  font-family: 'Bitter', serif;
+  font-size: 1.6rem;
+  border: 0;
+  padding: 5px 15px;
+  border-radius: 25px;
+  cursor: default;
+}
+
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  list-style: none;
+  padding: 12px 0 0 0;
+  margin: 0;
+  padding-left: 74px; /* space for line + dots */
+  font-family: 'Bitter', serif;
+}
+
+/* Vertical line */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 37px; /* center of line relative to left padding */
+  top: 60px;
+  bottom: 60px;
+  width: 2px;
+  background: #58815781;
+  border-radius: 2px;
+}
+
+.timelineItem {
+  position: relative;
+  padding: 18px 0;
+  margin-bottom: 8px;
+  border: none;
+  display: block;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -45px; /* position so dot sits on the line */
+  top: 40px; /* tweak to vertically align with time text */
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #111; /* inner dot color (black) */
+}
+
+.timelineItem.completed::before {
+  background: #376837;
+  box-shadow: 0 0 0 6px rgba(55, 104, 55, 0.12);
+}
+
+.time {
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-weight: 600;
+  color: #728271;
+  margin-bottom: 6px;
+}
+
+.message {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #243824;
+}
+
+/* Eco impact */
+.ecoGrid {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.donutWrap {
+  width: 160px;
+  text-align: center;
+}
+
+.donut {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.donutBg {
+  fill: none;
+  stroke: #eef6ef;
+  stroke-width: 6;
+}
+
+.donutValue {
+  fill: none;
+  stroke: #3f7a3f;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 18px 18px;
+}
+
+.donutText {
+  font-size: 6px;
+  text-anchor: middle;
+  fill: #274b2b;
+  font-weight: 600;
+}
+
+.donutLabel {
+  margin: 0;
+  font-size: 13px;
+  color: #5e7a5e;
+}
+
+.mapWrap {
+  flex: 1;
+}
+
+.mapPlaceholder {
+  background: linear-gradient(180deg, #f7fbf7, #fff);
+  border-radius: 8px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5b7a5b;
+  border: 1px solid #eef6ef;
+}
+
+.searchForm {
+  display: flex;
+  gap: 8px;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 5px;
+  border-radius: 28px;
+  font-size: 1.2rem;
+  outline: none;
+  border: none;
+}
+
+.searchButton {
+  background: #376837;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .donutWrap {
+    display: none;
+  }
+}
+
+/* Image-only card: let the image determine the card height (no fixed height) */
+.cardImageOnly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: linear-gradient(180deg, #fff, #fbfdfb);
+  border-radius: 8px;
+  overflow: visible; /* allow the card to grow if the image is larger */
+  height: auto; /* ensure card height isn't constrained */
+}
+
+.cardImage {
+  display: block;
+  max-width: 100%;
+  height: auto; /* preserve natural aspect ratio */
+  object-fit: contain;
+}
+
+.cardImage--natural {
+  max-height: 480px; /* adjust as needed; remove if you want no limit */
+  width: auto;
+  max-width: 100%;
+}
+
+.centerDashboard {
+  flex: 1 1 auto;
+  overflow: auto; /* enable scroll */
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 50px;
+}
+.quickAccessInner {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.quickAccessText {
+  flex: 1 1 420px;
+}
+
+.quickAccessText h3 {
+  margin: 0 0 8px 0;
+  color: #2b5b2e;
+  font-family: 'Bitter', serif;
+  font-size: 2.1rem;
+  margin-bottom: 50px;
+  text-align: left;
+}
+
+.quickAccessText p {
+  margin: 0 0 12px 0;
+  font-size: 1.4rem;
+  font-family: 'Bitter';
+  color: #2b2b2b;
+}
+
+.searchContainer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0;
+  flex-grow: 1;
+}
+.searchForm {
+  border: 2px solid #2b5b2e;
+  border-radius: 35px;
+  padding: 2px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 12px 14px;
+  outline: none;
+}
+
+.searchButton {
+  background: #376837;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-family: 'Bitter';
+  padding: 10px 26px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.quickAccessImage {
+  width: 250px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: 25px;
+}
+
+.quickAccessImage img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .deliveryCardImage {
+    display: none;
+  }
+  .quickAccessImage {
+    width: 100px;
+    flex: 0 0 100px;
+  }
+  .timeline {
+    padding-left: 58px;
+  }
+  .timeline::before {
+    left: 28px;
+  }
+  .timelineItem::before {
+    left: 22px;
+    width: 14px;
+    height: 14px;
+    box-shadow: 0 0 0 5px #eef6ef;
+  }
+}
+
+/* toolbar overrides scoped to this page
+   Toolbar receives the override class on the same element as headerNav,
+   so target the element directly */
+.toolbarOverride {
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 8px 12px;
+  display: flex; /* ensure flex context */
+  margin: 20px 30px;
+  align-items: center;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #b7df9b;
+}
+
+/* tweak icon sizes inside the toolbar */
+.toolbarOverride svg {
+  color: #ffffff !important;
 }

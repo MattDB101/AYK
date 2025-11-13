@@ -348,12 +348,12 @@ function EditUploadedLearning() {
             )}
           </div>
 
-          <SlideDeckUploader slides={slides} onSlidesChange={setSlides} />
           {uploadedLearning.slideDeckPath && slides.length === 0 && (
             <div className={styles.existingSlidesNote}>
-              <p>📁 This learning content has existing slides. Upload new slides above to replace them.</p>
+              <p>📁 This learning content has existing slides. Upload new slides below to replace them.</p>
             </div>
           )}
+          <SlideDeckUploader slides={slides} onSlidesChange={setSlides} />
 
           <VideoContentManager videos={videos} onVideosChange={setVideos} />
           <TipContentManager tips={tips} onTipsChange={setTips} />

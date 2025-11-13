@@ -3,6 +3,7 @@ import RecipeManager from './recipe-manager/RecipeManager';
 import SchoolManager from './school-manager/SchoolManager';
 import GeneralLearningManager from './general-learning-manager/GeneralLearningManager';
 import RecipeBookManager from './recipe-book-manager/RecipeBookManager';
+import OrdersManager from './orders-manager/OrdersManager';
 import UserManager from './user-manager/UserManager';
 import styles from './AdminPanel.module.css';
 
@@ -15,6 +16,7 @@ function AdminPanel() {
     { id: 'schools', label: 'Schools', component: SchoolManager },
     { id: 'users', label: 'Users', component: UserManager },
     { id: 'recipe-book', label: 'Recipe Book', component: RecipeBookManager },
+    { id: 'orders-manager', label: 'Orders Manager', component: OrdersManager },
   ];
 
   const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component;

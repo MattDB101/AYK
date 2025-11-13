@@ -17,7 +17,7 @@ import ArrowDown01StrokeRounded from '../icons/arrow-down-01-stroke-rounded';
 import Setting07StrokeRounded from '../icons/setting-07-stroke-rounded';
 import Logout02StrokeRounded from '../icons/logout-02-stroke-rounded';
 
-function Toolbar() {
+function Toolbar({ className }) {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -39,7 +39,7 @@ function Toolbar() {
   const id = open ? 'user-popover' : undefined;
 
   return (
-    <div className={styles.headerNav}>
+    <div className={`${styles.headerNav} ${className || ''}`}>
       <BubbleChatStrokeRounded />
       <Notification02StrokeRounded />
       <img
@@ -67,7 +67,7 @@ function Toolbar() {
             mt: 1,
             minWidth: 280,
             borderRadius: 2,
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #000000ff',
           },
         }}
       >

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import useSchoolClasses from '../../hooks/useSchoolClasses';
 import { useRecipes } from '../../hooks/recipes/useRecipes';
 import { useCart } from '../../context/cartContext';
 import { useSchoolDeliveryDays } from '../../hooks/useSchoolDeliveryDays'; // Add this import
@@ -11,19 +13,21 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CartIcon from '../../components/icons/cart-icon-stroke';
 
 const FILTERS = ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
-const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th Year'];
 
 function Order() {
   const { groupedRecipes, loading, error } = useRecipes();
   const { addToCart } = useCart();
   const { deliveryDays, loading: deliveryLoading, error: deliveryError, isDayAllowed } = useSchoolDeliveryDays(); // Add this
   const navigate = useNavigate();
+  const { user } = useAuthContext();
+  const schoolId = user?.claims?.schoolId || user?.schoolId;
+  const { classes: schoolClasses, loading: classesLoading } = useSchoolClasses(schoolId);
   const [activeFilters, setActiveFilters] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
-  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedClass, setSelectedClass] = useState(''); // will contain classId
   const [shakeButtonId, setShakeButtonId] = useState(null);
-  const [highlightYear, setHighlightYear] = useState(false);
+  const [highlightClass, setHighlightClass] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedQty, setSelectedQty] = useState(1);
 
@@ -65,29 +69,32 @@ function Order() {
     setPage(1);
   };
 
-  // Handle year selection
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
+  // Handle class selection
+  const handleClassChange = (e) => {
+    setSelectedClass(e.target.value);
   };
 
   // Handle add to cart
   const handleAddToCart = (recipe) => {
-    if (!selectedYear) {
+    if (!selectedClass) {
       setShakeButtonId(recipe.id);
-      setHighlightYear(true);
+      setHighlightClass(true);
       setTimeout(() => setShakeButtonId(null), 500);
-      setTimeout(() => setHighlightYear(false), 20000);
+      setTimeout(() => setHighlightClass(false), 20000);
       return;
     }
-    setHighlightYear(false);
+    setHighlightClass(false);
 
     // Use local date formatting
     const pad = (n) => n.toString().padStart(2, '0');
     const formatDateLocal = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    const selectedClassObj = (schoolClasses || []).find((c) => c.id === selectedClass) || {};
+    const selectedClassName = selectedClassObj.name || '';
 
     addToCart({
       ...recipe,
-      year: selectedYear,
+      class: selectedClass,
+      className: selectedClassName,
       date: selectedDate ? formatDateLocal(selectedDate) : null,
       qty: selectedQty,
     });
@@ -130,22 +137,22 @@ function Order() {
             </span>
           </div>
           <h2 className={styles.selectClass}>Order Details:</h2>
-          <div className={styles.yearDropdownContainer}>
-            <div className={styles.yearAndDateRow}>
-              <label htmlFor="year-select" className={styles.yearDropdownLabel}></label>
+          <div className={styles.classDropdownContainer}>
+            <div className={styles.classAndDateRow}>
+              <label htmlFor="class-select" className={styles.classDropdownLabel}></label>
               <div className={styles.selectWrapper}>
                 <select
-                  id="year-select"
-                  value={selectedYear}
-                  onChange={handleYearChange}
-                  className={`${styles.yearDropdown} ${highlightYear ? styles.yearDropdownError : ''}`}
+                  id="class-select"
+                  value={selectedClass}
+                  onChange={handleClassChange}
+                  className={`${styles.classDropdown} ${highlightClass ? styles.classDropdownError : ''}`}
                 >
                   <option value="" disabled>
-                    Select Year
+                    {classesLoading ? 'Loading classes…' : 'Select Class'}
                   </option>
-                  {YEARS.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
+                  {(schoolClasses || []).map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name || `Class ${cls.id}`}
                     </option>
                   ))}
                 </select>
@@ -235,7 +242,7 @@ function Order() {
             </div>
           </div>
         </div>
-        <div className={`${styles.basketBtn} ${styles.viewCartBtn}`} onClick={() => navigate('/order/cart')}>
+        <div className={`${styles.basketBtn} ${styles.viewCartBtn}`} onClick={() => navigate('/orders/cart')}>
           <CartIcon /> <span>View Basket</span>
         </div>
       </div>
@@ -294,7 +301,7 @@ function Order() {
                   <button
                     className={`${styles.addToCartBtn} ${shakeButtonId === recipe.id ? styles.shake : ''}`}
                     onClick={() => handleAddToCart(recipe)}
-                    title={!selectedYear ? 'Select a year before adding to basket' : ''}
+                    title={!selectedClass ? 'Select a class before adding to basket' : ''}
                   >
                     Add To Basket
                   </button>

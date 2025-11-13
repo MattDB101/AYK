@@ -18,8 +18,8 @@ export function CartProvider({ children }) {
 
   const addToCart = (item) => {
     setCart((prev) => {
-      // If item with same id and year exists, increase qty
-      const idx = prev.findIndex((i) => i.id === item.id && i.year === item.year);
+      // If item with same id and class exists, increase qty
+      const idx = prev.findIndex((i) => i.id === item.id && i.class === item.class);
       if (idx !== -1) {
         const updated = [...prev];
         updated[idx].qty = updated[idx].qty + 1;
@@ -29,28 +29,28 @@ export function CartProvider({ children }) {
     });
   };
 
-  const removeFromCart = (id, year) => {
-    setCart((prev) => prev.filter((i) => !(i.id === id && i.year === year)));
+  const removeFromCart = (id, classId) => {
+    setCart((prev) => prev.filter((i) => !(i.id === id && i.class === classId)));
   };
 
   const clearCart = () => setCart([]);
 
   const updateQty = (item, qty) => {
     setCart((prev) =>
-      prev.map((i) => (i.id === item.id && i.year === item.year ? { ...i, qty: Math.max(1, qty) } : i))
+      prev.map((i) => (i.id === item.id && i.class === item.class ? { ...i, qty: Math.max(1, qty) } : i))
     );
   };
 
   const updateNotes = (item, notes) => {
-    setCart((prev) => prev.map((i) => (i.id === item.id && i.year === item.year ? { ...i, notes } : i)));
+    setCart((prev) => prev.map((i) => (i.id === item.id && i.class === item.class ? { ...i, notes } : i)));
   };
 
   const updateDate = (item, date) => {
-    setCart((prev) => prev.map((i) => (i.id === item.id && i.year === item.year ? { ...i, date } : i)));
+    setCart((prev) => prev.map((i) => (i.id === item.id && i.class === item.class ? { ...i, date } : i)));
   };
 
-  const updateYear = (item, year) => {
-    setCart((prev) => prev.map((i) => (i.id === item.id ? { ...i, year } : i)));
+  const updateClass = (item, classId) => {
+    setCart((prev) => prev.map((i) => (i.id === item.id ? { ...i, class: classId } : i)));
   };
 
   return (
@@ -63,7 +63,7 @@ export function CartProvider({ children }) {
         updateQty,
         updateNotes,
         updateDate,
-        updateYear,
+        updateClass,
       }}
     >
       {children}

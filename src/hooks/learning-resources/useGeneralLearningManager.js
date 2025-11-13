@@ -257,22 +257,82 @@ export const useGeneralLearningManager = () => {
 
       await projectFirestore.collection('general-learning').doc(id).update(updateData);
 
-      // Handle content updates with proper thumbnail cleanup
+      // Handle content updates with proper thumbnail preservation & cleanup
       if (content.length > 0) {
-        // Delete all existing content first (with thumbnail cleanup)
-        const existingContent = await projectFirestore
+        // Fetch existing content docs
+        const existingSnapshot = await projectFirestore
           .collection('general-learning')
           .doc(id)
           .collection('content')
           .get();
 
-        for (const doc of existingContent.docs) {
-          const data = doc.data();
-          await deleteContent(id, doc.id, data.thumbnailStoragePath);
+        const existingContent = {};
+        existingSnapshot.docs.forEach((doc) => {
+          existingContent[doc.id] = doc.data();
+        });
+
+        // Upload any new thumbnails and remove File objects
+        const processedContent = await uploadContentThumbnails(id, content);
+
+        // Upsert each content item, preserving thumbnails when not replaced
+        for (const item of processedContent) {
+          const itemId = item.id.toString();
+          const itemData = {
+            title: item.title,
+            description: item.description,
+            type: item.type || 'video',
+            updatedAt: new Date(),
+          };
+
+          // If thumbnail was uploaded, item.thumbnailUrl and thumbnailStoragePath will be set by uploadContentThumbnails
+          if (item.thumbnailUrl) itemData.thumbnailUrl = item.thumbnailUrl;
+          if (item.thumbnailStoragePath) itemData.thumbnailStoragePath = item.thumbnailStoragePath;
+
+          // Preserve existing thumbnail if none provided for this item
+          if (
+            existingContent[itemId] &&
+            !itemData.thumbnailStoragePath &&
+            existingContent[itemId].thumbnailStoragePath
+          ) {
+            itemData.thumbnailUrl = existingContent[itemId].thumbnailUrl;
+            itemData.thumbnailStoragePath = existingContent[itemId].thumbnailStoragePath;
+          }
+
+          // Only include url for videos
+          if (item.type === 'video' && item.url && item.url.trim() !== '') {
+            itemData.url = item.url;
+          }
+
+          // Save/update the content document (merge to avoid overwriting other fields)
+          await projectFirestore
+            .collection('general-learning')
+            .doc(id)
+            .collection('content')
+            .doc(itemId)
+            .set(itemData, { merge: true });
+
+          // If a new thumbnail replaced an old one, delete the old storage object
+          if (
+            itemData.thumbnailStoragePath &&
+            existingContent[itemId] &&
+            existingContent[itemId].thumbnailStoragePath &&
+            existingContent[itemId].thumbnailStoragePath !== itemData.thumbnailStoragePath
+          ) {
+            try {
+              const oldThumbRef = ref(projectStorage, existingContent[itemId].thumbnailStoragePath);
+              await deleteObject(oldThumbRef);
+            } catch (err) {
+              console.warn('Could not delete old thumbnail:', err);
+            }
+          }
         }
 
-        // Save new content
-        await saveContent(id, content);
+        // Delete any items that were removed
+        for (const existingId of Object.keys(existingContent)) {
+          if (!processedContent.find((item) => item.id.toString() === existingId)) {
+            await deleteContent(id, existingId, existingContent[existingId].thumbnailStoragePath);
+          }
+        }
       }
 
       setLoading(false);

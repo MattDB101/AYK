@@ -1,13 +1,12 @@
 .root {
   display: flex;
-  height: 70px;
+  height: 80px;
   border-bottom: 1px solid #588157;
   color: white;
   font-size: 2rem;
   justify-content: space-between;
   align-items: end;
-  padding: 10px 40px;
-  padding-bottom: 20px;
+  padding: 20px 40px;
   font-family: 'Bitter', sans-serif;
   font-weight: bold;
 }

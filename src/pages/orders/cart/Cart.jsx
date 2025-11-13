@@ -1,4 +1,7 @@
+import React, { useEffect } from 'react';
 import { useCart } from '../../../context/CartContext';
+import { useAuthContext } from '../../../hooks/useAuthContext';
+import useSchoolClasses from '../../../hooks/useSchoolClasses';
 import styles from './cart.module.css';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -6,12 +9,23 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useOrder } from '../../../hooks/useOrder';
 
-const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th Year'];
+// class options come from school's classes
 
 function Cart() {
-  const { cart, removeFromCart, clearCart, updateQty, updateNotes, updateDate, updateYear } = useCart();
+  const { user } = useAuthContext();
+  const schoolId = user?.claims?.schoolId || user?.schoolId;
+  const { classes: schoolClasses, loading: classesLoading } = useSchoolClasses(schoolId);
+
+  const { cart, removeFromCart, clearCart, updateQty, updateNotes, updateDate, updateClass } = useCart();
   const navigate = useNavigate();
   const { createOrder } = useOrder();
+
+  // redirect back to ordering page when cart is (or becomes) empty
+  useEffect(() => {
+    if (!cart || cart.length === 0) {
+      navigate('/orders', { replace: true });
+    }
+  }, [cart, navigate]);
 
   const increaseQty = (item) => {
     updateQty(item, (item.qty || 1) + 1);
@@ -42,7 +56,7 @@ function Cart() {
 
   return (
     <div className={styles.cartContainer}>
-      <button className={styles.backButton} onClick={() => navigate('/order')}>
+      <button className={styles.backButton} onClick={() => navigate('/orders')}>
         ← Return to Ordering Page
       </button>
       <div className={styles.cartBox}>
@@ -51,22 +65,26 @@ function Cart() {
         {cart.length === 0 && <p>Your cart is empty.</p>}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           {cart.map((item, idx) => (
-            <div className={styles.cartCard} key={item.id + item.year + idx}>
+            <div className={styles.cartCard} key={item.id + item.class + idx}>
               <img src={item.imageUrl} alt={item.name} className={styles.cartImage} />
               <div className={styles.cartDetails}>
                 <div className={styles.cartTitle}>{item.name}</div>
-                <div className={styles.cartYear}>
+                <div className={styles.cartClass}>
                   Class:&nbsp;
                   <select
-                    value={item.year}
-                    onChange={(e) => updateYear(item, e.target.value)}
-                    className={styles.cartYearDropdown}
+                    value={item.class}
+                    onChange={(e) => updateClass(item, e.target.value)} // item.class stores classId now
+                    className={styles.cartClassDropdown}
                   >
-                    {YEARS.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
+                    {classesLoading ? (
+                      <option value="">Loading classes…</option>
+                    ) : (
+                      (schoolClasses || []).map((cls) => (
+                        <option key={cls.id} value={cls.id}>
+                          {cls.name || `Class ${cls.id}`}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
               </div>
@@ -108,7 +126,7 @@ function Cart() {
                   format="dd-MM-yyyy" // <-- Set to DD-MM-YYYY
                 />
               </div>
-              <button className={styles.cartRemoveBtn} onClick={() => removeFromCart(item.id, item.year)}>
+              <button className={styles.cartRemoveBtn} onClick={() => removeFromCart(item.id, item.class)}>
                 🗑️
               </button>
             </div>
